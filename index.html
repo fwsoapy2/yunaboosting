@@ -1,0 +1,986 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Yuna Boosts — Rocket League Boosting</title>
+  <meta name="description" content="Yuna Boosts — Premium Rocket League rank boosting. Fast, safe, professional." />
+  <style>
+    :root{ color-scheme: dark; }
+
+    :root{
+      --bg0:#040b1a;
+      --bg1:#061433;
+      --bg2:#081a44;
+
+      --cardA: rgba(8, 26, 68, .72);
+      --cardB: rgba(6, 18, 45, .78);
+
+      --stroke: rgba(90, 160, 255, .18);
+      --stroke2: rgba(90, 160, 255, .32);
+
+      --text:#eaf2ff;
+      --muted: rgba(234,242,255,.70);
+
+      --brand:#2f7cff;
+      --brand2:#69b3ff;
+
+      --shadow: 0 20px 70px rgba(0,0,0,.55);
+      --glow: 0 0 0 1px rgba(47,124,255,.35), 0 0 34px rgba(47,124,255,.24);
+      --radius: 18px;
+      --radius2: 24px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(900px 520px at 10% 15%, rgba(47,124,255,.34), transparent 58%),
+        radial-gradient(900px 520px at 88% 22%, rgba(105,179,255,.18), transparent 55%),
+        radial-gradient(900px 520px at 60% 95%, rgba(47,124,255,.16), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1), var(--bg2));
+      overflow-x:hidden;
+    }
+
+    .bg-orb{
+      position:fixed; inset:-140px;
+      background:
+        radial-gradient(520px 420px at 18% 25%, rgba(105,179,255,.16), transparent 60%),
+        radial-gradient(560px 440px at 78% 35%, rgba(47,124,255,.20), transparent 62%),
+        radial-gradient(560px 440px at 55% 78%, rgba(47,124,255,.16), transparent 62%);
+      filter: blur(10px);
+      opacity:.95;
+      pointer-events:none;
+      animation: drift 16s ease-in-out infinite;
+    }
+    @keyframes drift{
+      0%,100% { transform: translate3d(0,0,0) scale(1); }
+      50% { transform: translate3d(16px,-10px,0) scale(1.02); }
+    }
+
+    .container{
+      width:min(1180px, calc(100% - 40px));
+      margin:0 auto;
+      padding: 26px 0 56px;
+      position:relative;
+      z-index:1;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding: 6px 0 18px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      user-select:none;
+      min-width: 260px;
+    }
+    .logo{
+      width:44px; height:44px;
+      border-radius: 16px;
+      overflow:hidden;
+      box-shadow: 0 18px 50px rgba(47,124,255,.22), 0 0 0 1px rgba(255,255,255,.10) inset;
+      background: rgba(255,255,255,.06);
+      flex: 0 0 auto;
+    }
+    .logo img{ width:100%; height:100%; object-fit:cover; display:block; transform: scale(1.02); }
+    .brand h1{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:.65px;
+      text-transform:uppercase;
+      color: rgba(255,255,255,.94);
+      line-height:1.1;
+    }
+    .brand small{
+      display:block;
+      margin-top:3px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing:.2px;
+    }
+
+    .top-pills{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .pill{
+      border:1px solid rgba(90,160,255,.22);
+      background: rgba(8, 26, 68, .58);
+      color: rgba(255,255,255,.86);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      letter-spacing: .2px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.22);
+      backdrop-filter: blur(10px);
+    }
+    .pill strong{ color:#fff; }
+
+    .layout{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+      align-items:start;
+    }
+
+    .card{
+      border:1px solid rgba(90,160,255,.18);
+      background: linear-gradient(180deg, var(--cardA), var(--cardB));
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      position:relative;
+    }
+    .card .edge-glow{
+      position:absolute; inset:-1px;
+      border-radius: inherit;
+      pointer-events:none;
+      box-shadow: var(--glow);
+      opacity:.95;
+    }
+
+    /* Allow dropdown menus to overflow without clipping */
+    .calc{ padding: 18px; overflow: visible; }
+    .calc h2{ margin: 2px 0 8px; font-size: 18px; letter-spacing:.2px; }
+    .calc p{ margin:0 0 14px; color: var(--muted); font-size: 13.5px; line-height:1.45; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+      padding: 12px;
+      border-radius: var(--radius);
+      border:1px solid rgba(90,160,255,.18);
+      background: rgba(5, 14, 36, .45);
+      transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+      position:relative;
+      overflow: visible;
+    }
+    .field:hover{
+      transform: translateY(-1px);
+      border-color: rgba(90,160,255,.35);
+      background: rgba(5, 14, 36, .55);
+      box-shadow: 0 18px 55px rgba(0,0,0,.25);
+    }
+
+    label{
+      font-size: 12px;
+      color: rgba(255,255,255,.80);
+      letter-spacing:.2px;
+    }
+
+    /* Hidden native select (for semantics) */
+    select.native-hidden{
+      position:absolute;
+      opacity:0;
+      pointer-events:none;
+      width:1px; height:1px;
+    }
+
+    /* Custom Select */
+    .cs{ position:relative; }
+    .cs-btn{
+      width:100%;
+      text-align:left;
+      border-radius: 16px;
+      padding: 12px 42px 12px 12px;
+      border: 1px solid rgba(90,160,255,.20);
+      background: linear-gradient(180deg, rgba(8,26,68,.60), rgba(6,18,45,.66));
+      color: rgba(255,255,255,.94);
+      font-size: 13.8px;
+      letter-spacing:.15px;
+      cursor:pointer;
+      transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease, background .18s ease;
+      outline:none;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.05) inset;
+    }
+    .cs-btn:hover{
+      border-color: rgba(90,160,255,.42);
+      transform: translateY(-1px);
+    }
+    .cs-btn:focus{
+      border-color: rgba(47,124,255,.80);
+      box-shadow: 0 0 0 4px rgba(47,124,255,.18), 0 0 28px rgba(47,124,255,.16);
+    }
+
+    .cs-caret{
+      position:absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      opacity:.92;
+      pointer-events:none;
+      filter: drop-shadow(0 0 10px rgba(47,124,255,.30));
+      background:
+        linear-gradient(45deg, transparent 50%, rgba(255,255,255,.90) 50%),
+        linear-gradient(135deg, rgba(255,255,255,.90) 50%, transparent 50%);
+      background-position: 0 0, 7px 0;
+      background-size: 7px 7px, 7px 7px;
+      background-repeat:no-repeat;
+    }
+
+    /* KEY FIX:
+       - higher z-index when open
+       - menus always render above other fields */
+    .cs{ z-index: 1; }
+    .cs.open{ z-index: 9999; } /* ensures the active menu is always on top */
+
+    .cs-menu{
+      position:absolute;
+      left:0; right:0;
+      top: calc(100% + 8px);
+      border-radius: 16px;
+      border: 1px solid rgba(90,160,255,.26);
+      background: linear-gradient(180deg, rgba(6,18,45,.98), rgba(8,26,68,.98));
+      box-shadow: 0 24px 70px rgba(0,0,0,.65), 0 0 0 1px rgba(47,124,255,.10) inset;
+      backdrop-filter: blur(14px);
+      max-height: 280px;
+      overflow:auto;
+      z-index: 10000;
+      padding: 6px;
+      display:none;
+    }
+    .cs.open .cs-menu{ display:block; }
+
+    .cs-opt{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding: 10px 10px;
+      border-radius: 12px;
+      cursor:pointer;
+      color: rgba(255,255,255,.92);
+      font-size: 13.5px;
+      border: 1px solid transparent;
+      transition: background .14s ease, border-color .14s ease, transform .14s ease;
+      user-select:none;
+    }
+    .cs-opt:hover{
+      background: rgba(47,124,255,.14);
+      border-color: rgba(90,160,255,.22);
+      transform: translateY(-1px);
+    }
+    .cs-opt[aria-selected="true"]{
+      background: rgba(47,124,255,.22);
+      border-color: rgba(47,124,255,.35);
+      box-shadow: 0 0 0 3px rgba(47,124,255,.14);
+    }
+
+    .seg{
+      display:flex;
+      gap:10px;
+      padding: 12px;
+      border-radius: var(--radius);
+      border:1px solid rgba(90,160,255,.18);
+      background: rgba(5, 14, 36, .45);
+      align-items:center;
+      justify-content:space-between;
+    }
+    .toggle{ display:flex; gap:10px; }
+    .btn{
+      cursor:pointer;
+      user-select:none;
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      border:1px solid rgba(90,160,255,.18);
+      background: rgba(8, 26, 68, .45);
+      color: rgba(255,255,255,.88);
+      transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+      display:flex; align-items:center; gap:8px;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      border-color: rgba(90,160,255,.35);
+      box-shadow: 0 14px 40px rgba(0,0,0,.22);
+    }
+    .btn.active{
+      border-color: rgba(47,124,255,.85);
+      background: rgba(47,124,255,.22);
+      box-shadow: 0 0 0 4px rgba(47,124,255,.14), 0 0 26px rgba(47,124,255,.16);
+    }
+
+    /* Discord button under calculator */
+    .discord-cta{
+      margin-top: 14px;
+      display:flex;
+    }
+    .discord-btn{
+      width:100%;
+      cursor:pointer;
+      border:none;
+      border-radius: 14px;
+      padding: 14px 14px;
+      font-weight: 950;
+      letter-spacing:.2px;
+      color: #eaf2ff;
+      background: linear-gradient(135deg, rgba(47,124,255,1), rgba(105,179,255,1));
+      box-shadow: 0 18px 46px rgba(47,124,255,.22), 0 0 0 1px rgba(255,255,255,.10) inset;
+      transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+      text-align:center;
+    }
+    .discord-btn:hover{
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 22px 60px rgba(47,124,255,.26), 0 0 0 1px rgba(255,255,255,.12) inset;
+    }
+    .discord-btn:active{ transform: translateY(0px) scale(.99); }
+
+    /* Checkout */
+    .checkout{
+      padding: 18px;
+      position:sticky;
+      top: 16px;
+      overflow: visible;
+      background: linear-gradient(180deg, rgba(8,26,68,.78), rgba(6,18,45,.84));
+      border-color: rgba(90,160,255,.22);
+    }
+    .checkout-title{
+      font-size: 12px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.60);
+      margin: 2px 0 14px;
+    }
+    .sum{
+      border-radius: var(--radius2);
+      border: 1px solid rgba(90,160,255,.18);
+      background: rgba(5, 14, 36, .42);
+      padding: 14px;
+    }
+    .sum-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      font-size: 13.5px;
+    }
+    .sum-row:last-of-type{ border-bottom:none; }
+    .sum-left{ color: rgba(255,255,255,.60); }
+    .sum-right{
+      color: rgba(255,255,255,.94);
+      font-weight: 800;
+      text-align:right;
+      white-space:nowrap;
+    }
+    .sum-divider{
+      height: 1px;
+      background: rgba(255,255,255,.14);
+      margin: 14px 0;
+    }
+    .total-wrap{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap: 16px;
+      padding-top: 8px;
+    }
+    .total-wrap .label{
+      color: rgba(255,255,255,.92);
+      font-weight: 900;
+      font-size: 16px;
+    }
+    .total-wrap .price{
+      font-size: 34px;
+      font-weight: 950;
+      letter-spacing:-.6px;
+      color: rgba(255,255,255,.96);
+      text-shadow: 0 0 22px rgba(47,124,255,.16);
+    }
+    .eta{
+      margin-top: 10px;
+      color: rgba(255,255,255,.62);
+      font-size: 12.5px;
+      display:flex;
+      align-items:center;
+      gap: 8px;
+    }
+    .eta .clock{
+      width: 16px; height:16px;
+      border-radius: 99px;
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 0 18px rgba(47,124,255,.14);
+      position:relative;
+    }
+    .eta .clock:after{
+      content:"";
+      position:absolute;
+      left:50%; top:50%;
+      width: 1px; height: 6px;
+      background: rgba(255,255,255,.74);
+      transform: translate(-50%,-80%) rotate(25deg);
+      transform-origin: bottom;
+    }
+
+    .cta{ margin-top: 14px; display:flex; flex-direction:column; gap:10px; }
+
+    .primary{
+      cursor:pointer;
+      border:none;
+      border-radius: 14px;
+      padding: 14px 14px;
+      font-weight: 950;
+      letter-spacing:.2px;
+      color: #eaf2ff;
+      background: linear-gradient(135deg, rgba(47,124,255,1), rgba(105,179,255,1));
+      box-shadow: 0 18px 46px rgba(47,124,255,.22), 0 0 0 1px rgba(255,255,255,.10) inset;
+      transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+    }
+    .primary:hover{
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 22px 60px rgba(47,124,255,.26), 0 0 0 1px rgba(255,255,255,.12) inset;
+    }
+    .primary:active{ transform: translateY(0px) scale(.99); }
+    .primary:disabled{ opacity:.55; cursor:not-allowed; filter:saturate(.8); box-shadow:none; }
+
+    .status{
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(90,160,255,.18);
+      background: rgba(5, 14, 36, .35);
+      color: rgba(255,255,255,.78);
+      font-size: 12.5px;
+      line-height:1.45;
+    }
+    .status.ok{ border-color: rgba(47,124,255,.30); }
+    .status.bad{ border-color: rgba(255,90,122,.28); }
+
+    footer{
+      margin-top: 18px;
+      color: rgba(234,242,255,.55);
+      font-size: 12px;
+      line-height:1.5;
+      text-align:center;
+    }
+
+    @media (max-width: 980px){
+      .layout{ grid-template-columns: 1fr; }
+      .checkout{ position:relative; top:auto; }
+    }
+    @media (max-width: 720px){
+      .grid{ grid-template-columns: 1fr; }
+      header{ flex-direction:column; align-items:flex-start; }
+      .top-pills{ justify-content:flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-orb"></div>
+
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <img alt="Yuna Boosts Logo"
+               src="https://images-ext-1.discordapp.net/external/oHMiYNyU7kb5XMQ4WVjwV6mOyckRC_qQZcUYrZqk2gY/%3Fsize%3D4096/https/cdn.discordapp.com/icons/1451305417459372136/b73d024855d393a88a1ea6a3424dc989.png?format=webp&quality=lossless" />
+        </div>
+        <div>
+          <h1>Yuna Boosts</h1>
+          <small>Rocket League Rank Boosting • Premium Service</small>
+        </div>
+      </div>
+
+      <div class="top-pills">
+        <div class="pill">Full <strong>Bronze I → SSL</strong>: <strong>$80</strong> (Solo)</div>
+        <div class="pill">Duo: <strong>+20%</strong> • Non-NA Duo: <strong>+30%</strong></div>
+      </div>
+    </header>
+
+    <section class="layout">
+      <!-- Calculator -->
+      <div class="card calc">
+        <div class="edge-glow" aria-hidden="true"></div>
+        <h2>Boost Calculator</h2>
+        <p>Select your current rank, desired rank, and completion method. Price updates instantly.</p>
+
+        <div class="grid">
+          <div class="field">
+            <label>Current Rank</label>
+            <select id="currentRank" class="native-hidden" aria-label="Current Rank"></select>
+            <div class="cs" data-for="currentRank" id="csCurrent">
+              <button type="button" class="cs-btn" aria-haspopup="listbox" aria-expanded="false"></button>
+              <span class="cs-caret" aria-hidden="true"></span>
+              <div class="cs-menu" role="listbox"></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Desired Rank</label>
+            <select id="desiredRank" class="native-hidden" aria-label="Desired Rank"></select>
+            <div class="cs" data-for="desiredRank" id="csDesired">
+              <button type="button" class="cs-btn" aria-haspopup="listbox" aria-expanded="false"></button>
+              <span class="cs-caret" aria-hidden="true"></span>
+              <div class="cs-menu" role="listbox"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="seg">
+          <div>
+            <div style="font-weight:950; font-size:13.5px;">Completion Method</div>
+            <div style="color:var(--muted); font-size:12px; margin-top:2px;">Solo or Duo</div>
+          </div>
+          <div class="toggle" role="tablist" aria-label="Completion Method">
+            <div class="btn active" id="soloBtn" role="tab" tabindex="0" aria-selected="true">Solo</div>
+            <div class="btn" id="duoBtn" role="tab" tabindex="0" aria-selected="false">Duo</div>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="field" id="regionField" style="display:none;">
+          <label>Region (Duo Only)</label>
+          <select id="region" class="native-hidden" aria-label="Region">
+            <option value="NA">North America (NA)</option>
+            <option value="EU">Europe (EU)</option>
+            <option value="SAM">South America (SAM)</option>
+            <option value="OCE">Oceania (OCE)</option>
+            <option value="ASIA">Asia (ASIA)</option>
+            <option value="ME">Middle East (ME)</option>
+            <option value="AF">Africa (AF)</option>
+          </select>
+          <div class="cs" data-for="region" id="csRegion">
+            <button type="button" class="cs-btn" aria-haspopup="listbox" aria-expanded="false"></button>
+            <span class="cs-caret" aria-hidden="true"></span>
+            <div class="cs-menu" role="listbox"></div>
+          </div>
+        </div>
+
+        <!-- NEW: Join Discord button under calculator -->
+        <div class="discord-cta">
+          <button class="discord-btn" id="joinDiscordBtn">Join Discord</button>
+        </div>
+      </div>
+
+      <!-- Checkout -->
+      <aside class="card checkout">
+        <div class="edge-glow" aria-hidden="true"></div>
+
+        <div class="checkout-title">Order Summary</div>
+
+        <div class="sum">
+          <div class="sum-row">
+            <div class="sum-left">Game</div>
+            <div class="sum-right">Rocket League</div>
+          </div>
+          <div class="sum-row">
+            <div class="sum-left">Mode</div>
+            <div class="sum-right" id="sumMode">Solo</div>
+          </div>
+          <div class="sum-row">
+            <div class="sum-left">Start Rank</div>
+            <div class="sum-right" id="sumStart">—</div>
+          </div>
+          <div class="sum-row">
+            <div class="sum-left">End Rank</div>
+            <div class="sum-right" id="sumEnd">—</div>
+          </div>
+
+          <div class="sum-row" id="sumRegionRow" style="display:none;">
+            <div class="sum-left">Region</div>
+            <div class="sum-right" id="sumRegion">—</div>
+          </div>
+
+          <div class="sum-divider"></div>
+
+          <div class="total-wrap">
+            <div class="label">Total Price</div>
+            <div class="price" id="sumPrice">$0</div>
+          </div>
+
+          <div class="eta">
+            <div class="clock" aria-hidden="true"></div>
+            <div id="etaText">Estimated Time: —</div>
+          </div>
+        </div>
+
+        <div class="cta">
+          <button class="primary" id="checkoutBtn" disabled>Checkout</button>
+        </div>
+
+        <div class="status" id="statusBox">Choose ranks to generate a quote.</div>
+      </aside>
+    </section>
+
+    <footer>
+      © <span id="year"></span> Yuna Boosts • Checkout redirects to Discord.
+    </footer>
+  </div>
+
+<script>
+  /***************
+   * Rules:
+   * - Full Bronze I -> SSL = $80 (Solo)
+   * - Duo: +20%
+   * - If region is anything BUT NA: +10% extra (total +30%)
+   * - Bronze -> SSL time = 3 days, scale proportionally by difficulty-weighted distance
+   * - Prices are whole dollars only (no cents)
+   ***************/
+
+  const DISCORD_URL = "https://discord.gg/7w2BWAHSma";
+  const BASE_FULL_PRICE = 80;
+  const FULL_TIME_DAYS = 3; // Bronze I -> SSL reference
+
+  const ranks = [
+    "Bronze I","Bronze II","Bronze III",
+    "Silver I","Silver II","Silver III",
+    "Gold I","Gold II","Gold III",
+    "Platinum I","Platinum II","Platinum III",
+    "Diamond I","Diamond II","Diamond III",
+    "Champion I","Champion II","Champion III",
+    "Grand Champion I","Grand Champion II","Grand Champion III",
+    "Supersonic Legend"
+  ];
+
+  const tierFactor = {
+    "Bronze": 0.60,
+    "Silver": 0.95,
+    "Gold": 1.20,
+    "Platinum": 1.60,
+    "Diamond": 2.20,
+    "Champion": 3.05,
+    "Grand Champion": 4.85,
+    "Supersonic Legend": 7.00
+  };
+
+  function tierOf(rankName){
+    if (rankName.startsWith("Bronze")) return "Bronze";
+    if (rankName.startsWith("Silver")) return "Silver";
+    if (rankName.startsWith("Gold")) return "Gold";
+    if (rankName.startsWith("Platinum")) return "Platinum";
+    if (rankName.startsWith("Diamond")) return "Diamond";
+    if (rankName.startsWith("Champion")) return "Champion";
+    if (rankName.startsWith("Grand Champion")) return "Grand Champion";
+    return "Supersonic Legend";
+  }
+
+  const stepWeights = [];
+  for (let i=0; i<ranks.length-1; i++){
+    stepWeights.push(tierFactor[tierOf(ranks[i+1])]);
+  }
+  const fullPathWeight = stepWeights.reduce((a,b)=>a+b, 0);
+
+  function formatETA(days){
+    if (days <= 0) return "—";
+    if (days < 1){
+      const hoursRaw = days * 24;
+      const hours = Math.max(6, Math.round(hoursRaw / 6) * 6);
+      return `${hours} Hours`;
+    }
+    const d = Math.max(1, Math.round(days * 2) / 2);
+    const pretty = Number.isInteger(d) ? String(d) : d.toFixed(1);
+    return `${pretty} Day${d === 1 ? "" : "s"}`;
+  }
+
+  // Web Audio SFX
+  let audioCtx = null;
+  function sfx(type="tap"){
+    try{
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const t = audioCtx.currentTime;
+
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+
+      const settings = {
+        tap:     { f0: 420, f1: 240, dur: 0.05, vol: 0.045 },
+        switch:  { f0: 520, f1: 300, dur: 0.06, vol: 0.055 },
+        success: { f0: 700, f1: 920, dur: 0.08, vol: 0.060 },
+        warn:    { f0: 220, f1: 160, dur: 0.08, vol: 0.060 }
+      }[type] || { f0: 420, f1: 240, dur: 0.05, vol: 0.045 };
+
+      o.type = "sine";
+      o.frequency.setValueAtTime(settings.f0, t);
+      o.frequency.exponentialRampToValueAtTime(settings.f1, t + settings.dur);
+
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(settings.vol, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + settings.dur);
+
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(t); o.stop(t + settings.dur + 0.02);
+    }catch(e){}
+  }
+
+  // Elements
+  const currentRankEl = document.getElementById("currentRank");
+  const desiredRankEl = document.getElementById("desiredRank");
+  const regionEl = document.getElementById("region");
+
+  const soloBtn = document.getElementById("soloBtn");
+  const duoBtn  = document.getElementById("duoBtn");
+  const regionField = document.getElementById("regionField");
+
+  const sumMode = document.getElementById("sumMode");
+  const sumStart = document.getElementById("sumStart");
+  const sumEnd = document.getElementById("sumEnd");
+  const sumRegionRow = document.getElementById("sumRegionRow");
+  const sumRegion = document.getElementById("sumRegion");
+  const sumPriceEl = document.getElementById("sumPrice");
+  const etaText = document.getElementById("etaText");
+
+  const statusBox = document.getElementById("statusBox");
+  const checkoutBtn = document.getElementById("checkoutBtn");
+  const joinDiscordBtn = document.getElementById("joinDiscordBtn");
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  // Populate native selects (hidden)
+  function populateSelect(selectEl, list){
+    list.forEach((v, idx) => {
+      const opt = document.createElement("option");
+      opt.value = String(idx);
+      opt.textContent = v;
+      selectEl.appendChild(opt);
+    });
+  }
+  populateSelect(currentRankEl, ranks);
+  populateSelect(desiredRankEl, ranks);
+
+  // Defaults
+  currentRankEl.value = "0";
+  desiredRankEl.value = "3";
+
+  let method = "Solo"; // Solo | Duo
+
+  // Close-all helper (FIX)
+  function closeAllCustomSelects(except=null){
+    document.querySelectorAll(".cs.open").forEach(cs => {
+      if (except && cs === except) return;
+      cs.classList.remove("open");
+      const b = cs.querySelector(".cs-btn");
+      if (b) b.setAttribute("aria-expanded","false");
+    });
+  }
+
+  // Custom select builder
+  function buildCustomSelect(csRoot){
+    const selectId = csRoot.getAttribute("data-for");
+    const native = document.getElementById(selectId);
+    const btn = csRoot.querySelector(".cs-btn");
+    const menu = csRoot.querySelector(".cs-menu");
+
+    function close(){
+      csRoot.classList.remove("open");
+      btn.setAttribute("aria-expanded","false");
+    }
+    function open(){
+      // FIX: close any other open selects before opening this one
+      closeAllCustomSelects(csRoot);
+
+      csRoot.classList.add("open");
+      btn.setAttribute("aria-expanded","true");
+
+      // ensure selected is visible
+      const sel = menu.querySelector('[aria-selected="true"]');
+      if (sel) sel.scrollIntoView({ block: "nearest" });
+    }
+    function toggle(){
+      if (csRoot.classList.contains("open")) close(); else open();
+    }
+
+    function render(){
+      menu.innerHTML = "";
+      const opts = Array.from(native.options);
+      const currentVal = native.value;
+
+      const currentOpt = opts.find(o => o.value === currentVal);
+      btn.textContent = currentOpt ? currentOpt.textContent : "Select...";
+
+      opts.forEach(o => {
+        const item = document.createElement("div");
+        item.className = "cs-opt";
+        item.setAttribute("role","option");
+        item.setAttribute("tabindex","0");
+        item.dataset.value = o.value;
+        item.textContent = o.textContent;
+        item.setAttribute("aria-selected", o.value === currentVal ? "true" : "false");
+
+        item.addEventListener("click", (e) => {
+          e.stopPropagation();
+          native.value = o.value;
+          native.dispatchEvent(new Event("change", { bubbles:true }));
+          close();
+        });
+        item.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            item.click();
+          }
+        });
+
+        menu.appendChild(item);
+      });
+    }
+
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      sfx("tap");
+      toggle();
+    });
+
+    // FIX: close on outside click (single handler), but don't immediately close when clicking inside menu
+    document.addEventListener("click", () => close());
+
+    // prevent click inside menu from closing before selecting
+    menu.addEventListener("click", (e) => e.stopPropagation());
+
+    native.addEventListener("change", () => render());
+    render();
+
+    return { render, close, open };
+  }
+
+  const csCurrent = buildCustomSelect(document.getElementById("csCurrent"));
+  const csDesired = buildCustomSelect(document.getElementById("csDesired"));
+  const csRegion  = buildCustomSelect(document.getElementById("csRegion"));
+
+  function setStatus(kind, text){
+    statusBox.className = "status " + kind;
+    statusBox.textContent = text;
+  }
+
+  function setMethod(next){
+    method = next;
+    const duo = method === "Duo";
+
+    // FIX: close any open dropdown when switching modes
+    closeAllCustomSelects();
+
+    soloBtn.classList.toggle("active", !duo);
+    duoBtn.classList.toggle("active", duo);
+    soloBtn.setAttribute("aria-selected", String(!duo));
+    duoBtn.setAttribute("aria-selected", String(duo));
+
+    regionField.style.display = duo ? "flex" : "none";
+    sumRegionRow.style.display = duo ? "flex" : "none";
+
+    sumMode.textContent = duo ? "Duo" : "Solo";
+    sfx("switch");
+    update();
+  }
+
+  function computeDistanceWeight(fromIdx, toIdx){
+    if (toIdx <= fromIdx) return 0;
+    let w = 0;
+    for (let i=fromIdx; i<toIdx; i++) w += stepWeights[i];
+    return w;
+  }
+
+  function computeFinal(){
+    const fromIdx = parseInt(currentRankEl.value, 10);
+    const toIdx = parseInt(desiredRankEl.value, 10);
+
+    const w = computeDistanceWeight(fromIdx, toIdx);
+    const fraction = (fullPathWeight > 0) ? (w / fullPathWeight) : 0;
+
+    const baseRaw = BASE_FULL_PRICE * fraction;
+
+    let multiplier = 1.0;
+    if (method === "Duo"){
+      multiplier += 0.20;
+      if (regionEl.value !== "NA") multiplier += 0.10;
+    }
+
+    const finalRaw = baseRaw * multiplier;
+    const finalWhole = (toIdx > fromIdx) ? Math.max(1, Math.round(finalRaw)) : 0;
+
+    const etaDaysRaw = FULL_TIME_DAYS * fraction;
+
+    return { fromIdx, toIdx, finalWhole, etaDaysRaw };
+  }
+
+  function update(){
+    const { fromIdx, toIdx, finalWhole, etaDaysRaw } = computeFinal();
+
+    const fromName = ranks[fromIdx] ?? "—";
+    const toName = ranks[toIdx] ?? "—";
+
+    sumStart.textContent = fromName;
+    sumEnd.textContent = toName;
+
+    if (method === "Duo"){
+      const regionLabelMap = {
+        NA:"North America (NA)", EU:"Europe (EU)", SAM:"South America (SAM)",
+        OCE:"Oceania (OCE)", ASIA:"Asia (ASIA)", ME:"Middle East (ME)", AF:"Africa (AF)"
+      };
+      sumRegion.textContent = regionLabelMap[regionEl.value] || regionEl.value;
+    }
+
+    if (toIdx <= fromIdx){
+      sumPriceEl.textContent = "$0";
+      etaText.textContent = "Estimated Time: —";
+      checkoutBtn.disabled = true;
+      setStatus("bad", "Desired rank must be higher than current rank.");
+      return;
+    }
+
+    sumPriceEl.textContent = "$" + finalWhole.toLocaleString();
+    etaText.textContent = "Estimated Time: " + formatETA(etaDaysRaw);
+
+    checkoutBtn.disabled = false;
+
+    if (method === "Duo"){
+      const nonNA = regionEl.value !== "NA";
+      setStatus("ok", `Estimate ready: $${finalWhole} • Duo (${nonNA ? "Non-NA +30%" : "NA +20%"}).`);
+    } else {
+      setStatus("ok", `Estimate ready: $${finalWhole} • Solo.`);
+    }
+  }
+
+  // Events
+  currentRankEl.addEventListener("change", () => { sfx("tap"); update(); });
+  desiredRankEl.addEventListener("change", () => { sfx("tap"); update(); });
+  regionEl.addEventListener("change", () => { sfx("tap"); update(); });
+
+  soloBtn.addEventListener("click", () => setMethod("Solo"));
+  duoBtn.addEventListener("click", () => setMethod("Duo"));
+
+  [soloBtn, duoBtn].forEach(btn => {
+    btn.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); btn.click(); }
+    });
+  });
+
+  checkoutBtn.addEventListener("click", () => {
+    sfx("success");
+    window.location.href = DISCORD_URL;
+  });
+
+  joinDiscordBtn.addEventListener("click", () => {
+    sfx("success");
+    window.location.href = DISCORD_URL;
+  });
+
+  // Init
+  setMethod("Solo");
+  update();
+</script>
+</body>
+</html>
