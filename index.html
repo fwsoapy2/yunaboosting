@@ -6,7 +6,6 @@
   <title>Yuna Boosts</title>
   <meta name="description" content="Yuna Boosts, premium Rocket League boosting." />
 
-  <!-- Favicon -->
   <link rel="icon" type="image/png"
     href="https://images-ext-1.discordapp.net/external/oHMiYNyU7kb5XMQ4WVjwV6mOyckRC_qQZcUYrZqk2gY/%3Fsize%3D4096/https/cdn.discordapp.com/icons/1451305417459372136/b73d024855d393a88a1ea6a3424dc989.png?format=webp&quality=lossless" />
   <link rel="apple-touch-icon"
@@ -14,14 +13,10 @@
 
   <style>
     :root{ color-scheme: dark; }
-
     :root{
       --bg0:#040b1a;
       --bg1:#061433;
       --bg2:#081a44;
-
-      --cardA: rgba(8, 26, 68, .72);
-      --cardB: rgba(6, 18, 45, .78);
 
       --text:#eaf2ff;
       --muted: rgba(234,242,255,.70);
@@ -31,6 +26,7 @@
 
       --shadow: 0 20px 70px rgba(0,0,0,.55);
       --glow: 0 0 0 1px rgba(47,124,255,.35), 0 0 34px rgba(47,124,255,.24);
+
       --radius: 18px;
       --radius2: 24px;
     }
@@ -104,25 +100,6 @@
       color: rgba(255,255,255,.95);
       line-height:1.1;
     }
-
-    .top-pills{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-    .pill{
-      border:1px solid rgba(90,160,255,.22);
-      background: rgba(8, 26, 68, .58);
-      color: rgba(255,255,255,.86);
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-size: 13px;
-      letter-spacing: .2px;
-      box-shadow: 0 12px 40px rgba(0,0,0,.22);
-      backdrop-filter: blur(10px);
-    }
-    .pill strong{ color:#fff; }
 
     .layout{
       display:grid;
@@ -204,7 +181,7 @@
       font-size: 13.8px;
       letter-spacing:.15px;
       cursor:pointer;
-      transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease, background .18s ease;
+      transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
       outline:none;
       box-shadow: 0 0 0 1px rgba(0,0,0,.05) inset;
     }
@@ -476,7 +453,6 @@
     @media (max-width: 720px){
       .grid{ grid-template-columns: 1fr; }
       header{ flex-direction:column; align-items:flex-start; }
-      .top-pills{ justify-content:flex-start; }
     }
   </style>
 </head>
@@ -492,21 +468,15 @@
         </div>
         <h1>Yuna Boosts</h1>
       </div>
-
-      <div class="top-pills">
-        <div class="pill">Tournament Solo: <strong>GC $20</strong> • <strong>SSL $25</strong></div>
-        <div class="pill">Duo: <strong>+50%</strong> (all regions)</div>
-      </div>
+      <div></div>
     </header>
 
     <section class="layout">
-      <!-- Calculator -->
       <div class="card calc">
         <div class="edge-glow" aria-hidden="true"></div>
         <h2>Boost Calculator</h2>
         <p>Select your service, goal, and completion method. Price updates instantly.</p>
 
-        <!-- Service type -->
         <div class="seg" style="margin-bottom:12px;">
           <div>
             <div style="font-weight:950; font-size:13.5px;">Service Type</div>
@@ -518,7 +488,6 @@
           </div>
         </div>
 
-        <!-- Rank boost: Current + Desired in two columns -->
         <div class="grid" id="rankGrid">
           <div class="field">
             <label>Current Rank</label>
@@ -541,7 +510,6 @@
           </div>
         </div>
 
-        <!-- Tournament goal full width -->
         <div class="grid" id="tourGrid" style="display:none;">
           <div class="field span-2">
             <label>Tournament Goal</label>
@@ -556,7 +524,6 @@
 
         <div style="height:12px"></div>
 
-        <!-- Method -->
         <div class="seg">
           <div>
             <div style="font-weight:950; font-size:13.5px;">Completion Method</div>
@@ -570,7 +537,6 @@
 
         <div style="height:12px"></div>
 
-        <!-- Tournament Duo extras: Current 3s Rank above Region -->
         <div id="tourDuoExtras" style="display:none;">
           <div class="field">
             <label>Current 3s Rank</label>
@@ -585,7 +551,6 @@
           <div style="height:12px"></div>
         </div>
 
-        <!-- Region: full width feel (single field) -->
         <div class="field" id="regionField" style="display:none;">
           <label>Region (Duo Only)</label>
           <select id="region" class="native-hidden" aria-label="Region">
@@ -609,7 +574,6 @@
         </div>
       </div>
 
-      <!-- Checkout -->
       <aside class="card checkout">
         <div class="edge-glow" aria-hidden="true"></div>
 
@@ -632,12 +596,12 @@
           </div>
 
           <div class="sum-row" id="sumStartRow">
-            <div class="sum-left" id="sumStartLabel">Start</div>
+            <div class="sum-left" id="sumStartLabel">Start Rank</div>
             <div class="sum-right" id="sumStart">—</div>
           </div>
 
           <div class="sum-row">
-            <div class="sum-left" id="sumEndLabel">End</div>
+            <div class="sum-left" id="sumEndLabel">End Rank</div>
             <div class="sum-right" id="sumEnd">—</div>
           </div>
 
@@ -673,23 +637,11 @@
   </div>
 
 <script>
-  /***************
-   * Rules implemented:
-   * - Tournament Goal is full width
-   * - Tournament + Duo shows Current 3s Rank above Region
-   * - Tournament + Duo restricts max tournament tier based on Current 3s Rank (max = current tier + 1)
-   * - Tournament Solo has no restriction
-   * - Duo pricing is +50% for all regions
-   ***************/
-
   const DISCORD_URL = "https://discord.gg/7w2BWAHSma";
 
-  // Rank boost constants (unchanged)
   const RANK_BASE_FULL_PRICE = 80;
   const RANK_FULL_TIME_DAYS = 3;
 
-  // Tournament solo price per win (cheap and matches your anchors)
-  // GC = 20, SSL = 25
   const TOUR_PRICE_SOLO = {
     Bronze: 6,
     Silver: 8,
@@ -701,7 +653,6 @@
     "Supersonic Legend": 25
   };
 
-  // Tournament solo time per win
   const TOUR_HOURS_SOLO = {
     Bronze: 6,
     Silver: 7,
@@ -714,10 +665,14 @@
   };
 
   const PINK_SSL_WINS = 3;
-  const PINK_SSL_DISCOUNT = 0.80; // 15% off bulk
+  const PINK_SSL_DISCOUNT = 0.80;
 
-  function duoMultiplier(isDuo){
-    return isDuo ? 1.50 : 1.00; // +50% everywhere
+  function rankDuoMultiplier(regionValue){
+    return regionValue === "NA" ? 1.20 : 1.30;
+  }
+
+  function tournamentDuoMultiplier(){
+    return 1.50;
   }
 
   const ranks = [
@@ -755,7 +710,6 @@
     return "Supersonic Legend";
   }
 
-  // Tournament options (wins + discounted bundle)
   const tourOptions = [
     { label: "Bronze Tournament Win (1x)", tier: "Bronze", wins: 1 },
     { label: "Silver Tournament Win (1x)", tier: "Silver", wins: 1 },
@@ -765,10 +719,9 @@
     { label: "Champion Tournament Win (1x)", tier: "Champion", wins: 1 },
     { label: "Grand Champion Tournament Win (1x)", tier: "Grand Champion", wins: 1 },
     { label: "SSL Tournament Win (1x)", tier: "Supersonic Legend", wins: 1 },
-    { label: "Pink SSL Tournament Win", tier: "Supersonic Legend", wins: PINK_SSL_WINS, pink: true }
+    { label: "Pink SSL Tournament Win (3x)", tier: "Supersonic Legend", wins: PINK_SSL_WINS, pink: true }
   ];
 
-  // Rank boost weights
   const stepWeights = [];
   for (let i=0; i<ranks.length-1; i++){
     stepWeights.push(tierFactor[tierOfRank(ranks[i+1])]);
@@ -794,7 +747,6 @@
     return `${pretty} Day${d === 1 ? "" : "s"}`;
   }
 
-  // Web Audio SFX
   let audioCtx = null;
   function sfx(type="tap"){
     try{
@@ -823,7 +775,6 @@
     }catch(e){}
   }
 
-  // Elements
   const rankBoostBtn = document.getElementById("rankBoostBtn");
   const tourBoostBtn = document.getElementById("tourBoostBtn");
 
@@ -863,9 +814,8 @@
 
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  // State
-  let serviceType = "RANK"; // RANK | TOUR
-  let method = "Solo";     // Solo | Duo
+  let serviceType = "RANK";
+  let method = "Solo";
 
   function populateSelect(selectEl, list){
     selectEl.innerHTML = "";
@@ -891,13 +841,11 @@
   }
   populateTourGoal();
 
-  // Defaults
   rankCurrent.value = "0";
   rankDesired.value = "3";
   tour3sRank.value = "0";
-  tourGoal.value = "7"; // SSL 1x
+  tourGoal.value = "7";
 
-  // Custom select system with disable support
   function closeAllCustomSelects(except=null){
     document.querySelectorAll(".cs.open").forEach(cs => {
       if (except && cs === except) return;
@@ -978,7 +926,7 @@
     native.addEventListener("change", () => render());
     render();
 
-    return { render, close, open, native };
+    return { render, native };
   }
 
   const csRankCurrent = buildCustomSelect(document.getElementById("csRankCurrent"));
@@ -1035,14 +983,11 @@
     const isDuo = method === "Duo";
     const isTour = serviceType === "TOUR";
 
-    // Region shows for any Duo
     regionField.style.display = isDuo ? "flex" : "none";
     sumRegionRow.style.display = isDuo ? "flex" : "none";
 
-    // Tournament Duo extras show only if Tournament + Duo
     tourDuoExtras.style.display = (isTour && isDuo) ? "block" : "none";
 
-    // Summary labels
     if (serviceType === "RANK"){
       sumStartLabel.textContent = "Start Rank";
       sumEndLabel.textContent = "End Rank";
@@ -1053,13 +998,11 @@
         sumStartLabel.textContent = "Current 3s Rank";
         sumStartRow.style.display = "flex";
       } else {
-        // For tournament solo, no current rank needed
         sumStartRow.style.display = "none";
       }
     }
   }
 
-  // Tournament Duo restriction: max tier allowed = current tier + 1
   function maxAllowedTournamentTierForDuo(current3sTier){
     const idx = tierOrder.indexOf(current3sTier);
     if (idx < 0) return "Bronze";
@@ -1067,14 +1010,11 @@
   }
 
   function updateTournamentRestrictions(){
-    // Only restrict for Tournament + Duo
     const restrict = (serviceType === "TOUR" && method === "Duo");
 
-    // Enable everything first
     Array.from(tourGoal.options).forEach(o => { o.disabled = false; });
 
     if (!restrict){
-      // If previously restricted, just re-render
       csTourGoal.render();
       return;
     }
@@ -1083,17 +1023,14 @@
     const maxTier = maxAllowedTournamentTierForDuo(currentTier);
     const maxIdx = tierOrder.indexOf(maxTier);
 
-    // Disable any tournament goal above maxIdx
     Array.from(tourGoal.options).forEach((opt, i) => {
       const tier = tourOptions[i].tier;
       const tierIdx = tierOrder.indexOf(tier);
       if (tierIdx > maxIdx) opt.disabled = true;
     });
 
-    // If current selection is now disabled, snap to highest allowed
     const curIdx = parseInt(tourGoal.value, 10);
     if (tourGoal.options[curIdx] && tourGoal.options[curIdx].disabled){
-      // find highest allowed option
       let best = 0;
       for (let i=0; i<tourGoal.options.length; i++){
         if (!tourGoal.options[i].disabled) best = i;
@@ -1119,7 +1056,6 @@
 
   function computeFinal(){
     const isDuo = method === "Duo";
-    const mult = duoMultiplier(isDuo);
 
     if (serviceType === "RANK"){
       const fromIdx = parseInt(rankCurrent.value, 10);
@@ -1131,6 +1067,10 @@
       const fraction = fullPathWeight > 0 ? (w / fullPathWeight) : 0;
 
       const baseRaw = RANK_BASE_FULL_PRICE * fraction;
+
+      let mult = 1.0;
+      if (isDuo) mult = rankDuoMultiplier(region.value);
+
       const finalRaw = baseRaw * mult;
       const finalWhole = (toIdx > fromIdx) ? Math.max(1, Math.round(finalRaw)) : 0;
 
@@ -1145,10 +1085,13 @@
       };
     }
 
-    // Tournament
     const optIdx = parseInt(tourGoal.value, 10);
     const opt = tourOptions[optIdx];
+
     const { total, etaDays } = computeTournamentTotalAndETA(opt.tier, opt.wins, !!opt.pink);
+
+    let mult = 1.0;
+    if (isDuo) mult = tournamentDuoMultiplier();
 
     const finalRaw = total * mult;
     const finalWhole = Math.max(1, Math.round(finalRaw));
@@ -1157,12 +1100,10 @@
       ? (ranks[parseInt(tour3sRank.value, 10)] || "—")
       : "";
 
-    const endText = opt.pink ? "Pink SSL Tournament Boost (3 Wins)" : opt.label;
-
     return {
       ok: true,
       startText,
-      endText,
+      endText: opt.label,
       price: finalWhole,
       etaDays
     };
@@ -1175,7 +1116,6 @@
       sumStart.textContent = res.startText;
       sumEnd.textContent = res.endText;
     } else {
-      // tournament
       if (method === "Duo") sumStart.textContent = res.startText;
       sumEnd.textContent = res.endText;
     }
@@ -1200,11 +1140,10 @@
     etaText.textContent = "Estimated Time: " + formatETAFromDays(res.etaDays);
     checkoutBtn.disabled = false;
 
-    const duoText = (method === "Duo") ? "Duo (+50%)" : "Solo";
+    const duoText = (method === "Duo") ? "Duo" : "Solo";
     setStatus("ok", `Estimate ready: $${res.price} • ${serviceType === "RANK" ? "Rank Boost" : "Tournament Boost"} • ${duoText}.`);
   }
 
-  // Events
   rankBoostBtn.addEventListener("click", () => setService("RANK"));
   tourBoostBtn.addEventListener("click", () => setService("TOUR"));
 
@@ -1234,7 +1173,6 @@
     window.location.href = DISCORD_URL;
   });
 
-  // Init
   setService("RANK");
   setMethod("Solo");
   updateTournamentRestrictions();
