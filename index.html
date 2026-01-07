@@ -639,33 +639,47 @@
 <script>
   const DISCORD_URL = "https://discord.gg/7w2BWAHSma";
 
-  const RANK_BASE_FULL_PRICE = 80;
+  const RANK_BASE_FULL_PRICE = 75;
   const RANK_FULL_TIME_DAYS = 3;
 
+  const RANK_STEP_COST = [
+    0,  1,  1,  2,  2,  2,  2,  2,  3,  3,  3,
+    3,  3,  3,  5,  5,  4,  6,  6,  6, 13
+  ];
+
+  function computeRankBasePrice(fromIdx, toIdx){
+    if (toIdx <= fromIdx) return 0;
+    let total = 0;
+    for (let i = fromIdx; i < toIdx; i++){
+      total += (RANK_STEP_COST[i] ?? 0);
+    }
+    return total;
+  }
+
   const TOUR_PRICE_SOLO = {
-    Bronze: 2,
-    Silver: 4,
-    Gold: 6,
-    Platinum: 8,
-    Diamond: 10,
-    Champion: 12,
-    "Grand Champion": 15,
-    "Supersonic Legend": 20
+    Bronze: 6,
+    Silver: 8,
+    Gold: 10,
+    Platinum: 13,
+    Diamond: 16,
+    Champion: 18,
+    "Grand Champion": 20,
+    "Supersonic Legend": 25
   };
 
   const TOUR_HOURS_SOLO = {
-    Bronze: 24,
-    Silver: 24,
-    Gold: 24,
-    Platinum: 24,
-    Diamond: 24,
-    Champion: 24,
-    "Grand Champion": 24,
-    "Supersonic Legend": 24
+    Bronze: 6,
+    Silver: 7,
+    Gold: 8,
+    Platinum: 10,
+    Diamond: 12,
+    Champion: 14,
+    "Grand Champion": 18,
+    "Supersonic Legend": 22
   };
 
   const PINK_SSL_WINS = 3;
-  const PINK_SSL_DISCOUNT = 0.75;
+  const PINK_SSL_DISCOUNT = 0.80;
 
   function rankDuoMultiplier(regionValue){
     return regionValue === "NA" ? 1.20 : 1.30;
@@ -685,17 +699,6 @@
     "Grand Champion I","Grand Champion II","Grand Champion III",
     "Supersonic Legend"
   ];
-
-  const tierFactor = {
-    "Bronze": 0.60,
-    "Silver": 0.95,
-    "Gold": 1.20,
-    "Platinum": 1.60,
-    "Diamond": 2.20,
-    "Champion": 3.05,
-    "Grand Champion": 4.85,
-    "Supersonic Legend": 7.00
-  };
 
   const tierOrder = ["Bronze","Silver","Gold","Platinum","Diamond","Champion","Grand Champion","Supersonic Legend"];
 
@@ -721,19 +724,6 @@
     { label: "SSL Tournament Win (1x)", tier: "Supersonic Legend", wins: 1 },
     { label: "Pink SSL Tournament Win (3x)", tier: "Supersonic Legend", wins: PINK_SSL_WINS, pink: true }
   ];
-
-  const stepWeights = [];
-  for (let i=0; i<ranks.length-1; i++){
-    stepWeights.push(tierFactor[tierOfRank(ranks[i+1])]);
-  }
-  const fullPathWeight = stepWeights.reduce((a,b)=>a+b, 0);
-
-  function computeRankDistanceWeight(fromIdx, toIdx){
-    if (toIdx <= fromIdx) return 0;
-    let w = 0;
-    for (let i=fromIdx; i<toIdx; i++) w += stepWeights[i];
-    return w;
-  }
 
   function formatETAFromDays(days){
     if (days <= 0) return "—";
@@ -1063,17 +1053,15 @@
       const fromName = ranks[fromIdx] || "—";
       const toName = ranks[toIdx] || "—";
 
-      const w = computeRankDistanceWeight(fromIdx, toIdx);
-      const fraction = fullPathWeight > 0 ? (w / fullPathWeight) : 0;
-
-      const baseRaw = RANK_BASE_FULL_PRICE * fraction;
+      const basePrice = computeRankBasePrice(fromIdx, toIdx);
 
       let mult = 1.0;
       if (isDuo) mult = rankDuoMultiplier(region.value);
 
-      const finalRaw = baseRaw * mult;
+      const finalRaw = basePrice * mult;
       const finalWhole = (toIdx > fromIdx) ? Math.max(1, Math.round(finalRaw)) : 0;
 
+      const fraction = (RANK_BASE_FULL_PRICE > 0) ? (basePrice / RANK_BASE_FULL_PRICE) : 0;
       const etaDays = RANK_FULL_TIME_DAYS * fraction;
 
       return {
@@ -1180,4 +1168,3 @@
 </script>
 </body>
 </html>
-
