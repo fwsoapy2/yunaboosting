@@ -537,20 +537,6 @@
 
         <div style="height:12px"></div>
 
-        <div id="tourDuoExtras" style="display:none;">
-          <div class="field">
-            <label>Current 3s Rank</label>
-            <select id="tour3sRank" class="native-hidden" aria-label="Current 3s Rank"></select>
-            <div class="cs" data-for="tour3sRank" id="csTour3sRank">
-              <button type="button" class="cs-btn" aria-haspopup="listbox" aria-expanded="false"></button>
-              <span class="cs-caret" aria-hidden="true"></span>
-              <div class="cs-menu" role="listbox"></div>
-            </div>
-          </div>
-
-          <div style="height:12px"></div>
-        </div>
-
         <div class="field" id="regionField" style="display:none;">
           <label>Region (Duo Only)</label>
           <select id="region" class="native-hidden" aria-label="Region">
@@ -639,12 +625,17 @@
 <script>
   const DISCORD_URL = "https://discord.gg/7w2BWAHSma";
 
-  const RANK_BASE_FULL_PRICE = 75;
+  // Rank Boost pricing targets (Solo NA):
+  // Bronze I -> SSL = $100
+  // GC1 -> SSL = $40
+  // GC3 -> SSL = $20
+  const RANK_BASE_FULL_PRICE = 100;
   const RANK_FULL_TIME_DAYS = 3;
 
+  // Step costs from each rank to the next (length 21, from Bronze I -> Bronze II ... GC3 -> SSL)
   const RANK_STEP_COST = [
-    0,  1,  1,  2,  2,  2,  2,  2,  3,  3,  3,
-    3,  3,  3,  5,  5,  4,  6,  6,  6, 13
+    1,  2,  2,  3,  3,  2,  2,  2,  3,  4,  4,
+    4,  4,  4,  5,  5,  4,  6, 10, 10, 20
   ];
 
   function computeRankBasePrice(fromIdx, toIdx){
@@ -656,15 +647,21 @@
     return total;
   }
 
+  // Tournament Boost (Solo) prices
+  // Requirements:
+  // SSL solo win = $20
+  // GC solo win = $15
+  // Pink title package = $50
+  // Lower the others
   const TOUR_PRICE_SOLO = {
-    Bronze: 6,
-    Silver: 8,
-    Gold: 10,
-    Platinum: 13,
-    Diamond: 16,
-    Champion: 18,
-    "Grand Champion": 20,
-    "Supersonic Legend": 25
+    Bronze: 5,
+    Silver: 6,
+    Gold: 7,
+    Platinum: 9,
+    Diamond: 11,
+    Champion: 13,
+    "Grand Champion": 15,
+    "Supersonic Legend": 20
   };
 
   const TOUR_HOURS_SOLO = {
@@ -679,14 +676,17 @@
   };
 
   const PINK_SSL_WINS = 3;
-  const PINK_SSL_DISCOUNT = 0.80;
+  const PINK_SSL_PRICE_SOLO = 50;
 
+  // Duo multipliers
+  // Rank: Duo = +30%, and non-NA adds +20% more (total +50%)
   function rankDuoMultiplier(regionValue){
-    return regionValue === "NA" ? 1.20 : 1.30;
+    return regionValue === "NA" ? 1.30 : 1.50;
   }
 
-  function tournamentDuoMultiplier(){
-    return 1.50;
+  // Tournament: Duo = +50%, and non-NA is +75%
+  function tournamentDuoMultiplier(regionValue){
+    return regionValue === "NA" ? 1.50 : 1.75;
   }
 
   const ranks = [
@@ -699,8 +699,6 @@
     "Grand Champion I","Grand Champion II","Grand Champion III",
     "Supersonic Legend"
   ];
-
-  const tierOrder = ["Bronze","Silver","Gold","Platinum","Diamond","Champion","Grand Champion","Supersonic Legend"];
 
   function tierOfRank(rankName){
     if (rankName.startsWith("Bronze")) return "Bronze";
@@ -775,8 +773,6 @@
   const rankDesired = document.getElementById("rankDesired");
 
   const tourGoal = document.getElementById("tourGoal");
-  const tourDuoExtras = document.getElementById("tourDuoExtras");
-  const tour3sRank = document.getElementById("tour3sRank");
 
   const soloBtn = document.getElementById("soloBtn");
   const duoBtn  = document.getElementById("duoBtn");
@@ -818,7 +814,6 @@
   }
   populateSelect(rankCurrent, ranks);
   populateSelect(rankDesired, ranks);
-  populateSelect(tour3sRank, ranks);
 
   function populateTourGoal(){
     tourGoal.innerHTML = "";
@@ -833,7 +828,6 @@
 
   rankCurrent.value = "0";
   rankDesired.value = "3";
-  tour3sRank.value = "0";
   tourGoal.value = "7";
 
   function closeAllCustomSelects(except=null){
@@ -922,7 +916,6 @@
   const csRankCurrent = buildCustomSelect(document.getElementById("csRankCurrent"));
   const csRankDesired = buildCustomSelect(document.getElementById("csRankDesired"));
   const csTourGoal    = buildCustomSelect(document.getElementById("csTourGoal"));
-  const csTour3sRank  = buildCustomSelect(document.getElementById("csTour3sRank"));
   const csRegion      = buildCustomSelect(document.getElementById("csRegion"));
 
   function setStatus(kind, text){
@@ -947,7 +940,6 @@
     sumService.textContent = isRank ? "Rank Boost" : "Tournament Boost";
 
     updateVisibility();
-    updateTournamentRestrictions();
     update();
   }
 
@@ -965,82 +957,38 @@
     sumMode.textContent = isDuo ? "Duo" : "Solo";
 
     updateVisibility();
-    updateTournamentRestrictions();
     update();
   }
 
   function updateVisibility(){
     const isDuo = method === "Duo";
-    const isTour = serviceType === "TOUR";
+    const isRank = serviceType === "RANK";
 
     regionField.style.display = isDuo ? "flex" : "none";
     sumRegionRow.style.display = isDuo ? "flex" : "none";
 
-    tourDuoExtras.style.display = (isTour && isDuo) ? "block" : "none";
-
-    if (serviceType === "RANK"){
+    if (isRank){
       sumStartLabel.textContent = "Start Rank";
       sumEndLabel.textContent = "End Rank";
       sumStartRow.style.display = "flex";
     } else {
       sumEndLabel.textContent = "Tournament Goal";
-      if (isDuo){
-        sumStartLabel.textContent = "Current 3s Rank";
-        sumStartRow.style.display = "flex";
-      } else {
-        sumStartRow.style.display = "none";
-      }
+      sumStartRow.style.display = "none";
     }
-  }
-
-  function maxAllowedTournamentTierForDuo(current3sTier){
-    const idx = tierOrder.indexOf(current3sTier);
-    if (idx < 0) return "Bronze";
-    return tierOrder[Math.min(idx + 1, tierOrder.length - 1)];
-  }
-
-  function updateTournamentRestrictions(){
-    const restrict = (serviceType === "TOUR" && method === "Duo");
-
-    Array.from(tourGoal.options).forEach(o => { o.disabled = false; });
-
-    if (!restrict){
-      csTourGoal.render();
-      return;
-    }
-
-    const currentTier = tierOfRank(ranks[parseInt(tour3sRank.value, 10)] || "Bronze I");
-    const maxTier = maxAllowedTournamentTierForDuo(currentTier);
-    const maxIdx = tierOrder.indexOf(maxTier);
-
-    Array.from(tourGoal.options).forEach((opt, i) => {
-      const tier = tourOptions[i].tier;
-      const tierIdx = tierOrder.indexOf(tier);
-      if (tierIdx > maxIdx) opt.disabled = true;
-    });
-
-    const curIdx = parseInt(tourGoal.value, 10);
-    if (tourGoal.options[curIdx] && tourGoal.options[curIdx].disabled){
-      let best = 0;
-      for (let i=0; i<tourGoal.options.length; i++){
-        if (!tourGoal.options[i].disabled) best = i;
-      }
-      tourGoal.value = String(best);
-      tourGoal.dispatchEvent(new Event("change", { bubbles:true }));
-    }
-
-    csTourGoal.render();
   }
 
   function computeTournamentTotalAndETA(tier, wins, isPink){
-    const single = TOUR_PRICE_SOLO[tier];
-    let total = single * wins;
-    if (isPink) total *= PINK_SSL_DISCOUNT;
-
     const hoursPerWin = TOUR_HOURS_SOLO[tier];
-    let hours = hoursPerWin * wins;
-    if (isPink) hours *= 0.90;
 
+    if (isPink){
+      const hours = (hoursPerWin * wins) * 0.90;
+      return { total: PINK_SSL_PRICE_SOLO, etaDays: hours / 24 };
+    }
+
+    const single = TOUR_PRICE_SOLO[tier];
+    const total = single * wins;
+
+    const hours = hoursPerWin * wins;
     return { total, etaDays: hours / 24 };
   }
 
@@ -1079,18 +1027,14 @@
     const { total, etaDays } = computeTournamentTotalAndETA(opt.tier, opt.wins, !!opt.pink);
 
     let mult = 1.0;
-    if (isDuo) mult = tournamentDuoMultiplier();
+    if (isDuo) mult = tournamentDuoMultiplier(region.value);
 
     const finalRaw = total * mult;
     const finalWhole = Math.max(1, Math.round(finalRaw));
 
-    const startText = (method === "Duo")
-      ? (ranks[parseInt(tour3sRank.value, 10)] || "—")
-      : "";
-
     return {
       ok: true,
-      startText,
+      startText: "",
       endText: opt.label,
       price: finalWhole,
       etaDays
@@ -1104,7 +1048,6 @@
       sumStart.textContent = res.startText;
       sumEnd.textContent = res.endText;
     } else {
-      if (method === "Duo") sumStart.textContent = res.startText;
       sumEnd.textContent = res.endText;
     }
 
@@ -1143,12 +1086,6 @@
 
   tourGoal.addEventListener("change", () => { sfx("tap"); update(); });
 
-  tour3sRank.addEventListener("change", () => {
-    sfx("tap");
-    updateTournamentRestrictions();
-    update();
-  });
-
   region.addEventListener("change", () => { sfx("tap"); update(); });
 
   checkoutBtn.addEventListener("click", () => {
@@ -1163,7 +1100,6 @@
 
   setService("RANK");
   setMethod("Solo");
-  updateTournamentRestrictions();
   update();
 </script>
 </body>
