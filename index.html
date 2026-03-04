@@ -124,7 +124,7 @@
       opacity:.95;
     }
 
-    .calc{ padding: 18px; overflow: visible; }
+    .calc{ padding: 18px; overflow: visible; position:relative; z-index:2; }
     .calc h2{ margin: 2px 0 8px; font-size: 18px; letter-spacing:.2px; }
     .calc p{ margin:0 0 14px; color: var(--muted); font-size: 13.5px; line-height:1.45; }
 
@@ -146,6 +146,7 @@
       transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
       position:relative;
       overflow: visible;
+      z-index:0;
     }
     .field:hover{
       transform: translateY(-1px);
@@ -153,12 +154,37 @@
       background: rgba(5, 14, 36, .55);
       box-shadow: 0 18px 55px rgba(0,0,0,.25);
     }
+    .field.field-open{
+      z-index: 30000;
+      transform: none;
+    }
 
     label{
       font-size: 12px;
       color: rgba(255,255,255,.80);
       letter-spacing:.2px;
     }
+
+    .input, .textarea{
+      width:100%;
+      border-radius: 16px;
+      padding: 12px 12px;
+      border: 1px solid rgba(90,160,255,.20);
+      background: linear-gradient(180deg, rgba(8,26,68,.60), rgba(6,18,45,.66));
+      color: rgba(255,255,255,.94);
+      font-size: 13.8px;
+      letter-spacing:.15px;
+      outline:none;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.05) inset;
+      transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+    .input:hover, .textarea:hover{ border-color: rgba(90,160,255,.42); transform: translateY(-1px); }
+    .input:focus, .textarea:focus{
+      border-color: rgba(47,124,255,.80);
+      box-shadow: 0 0 0 4px rgba(47,124,255,.18), 0 0 28px rgba(47,124,255,.16);
+      transform:none;
+    }
+    .textarea{ min-height: 110px; resize: vertical; }
 
     select.native-hidden{
       position:absolute;
@@ -168,7 +194,7 @@
     }
 
     .cs{ position:relative; z-index:1; }
-    .cs.open{ z-index: 9999; }
+    .cs.open{ z-index: 31000; }
 
     .cs-btn{
       width:100%;
@@ -223,7 +249,7 @@
       backdrop-filter: blur(14px);
       max-height: 280px;
       overflow:auto;
-      z-index: 10000;
+      z-index: 32000;
       padding: 6px;
       display:none;
     }
@@ -325,6 +351,7 @@
       overflow: visible;
       background: linear-gradient(180deg, rgba(8,26,68,.78), rgba(6,18,45,.84));
       border-color: rgba(90,160,255,.22);
+      z-index:1;
     }
     .checkout-title{
       font-size: 12px;
@@ -474,84 +501,148 @@
     <section class="layout">
       <div class="card calc">
         <div class="edge-glow" aria-hidden="true"></div>
-        <h2>Boost Calculator</h2>
-        <p>Select your service, goal, and completion method. Price updates instantly.</p>
+        <h2>YunaBoosts</h2>
+        <p>#1 SSL Boosts 0% Ban Chance</p>
 
         <div class="seg" style="margin-bottom:12px;">
           <div>
-            <div style="font-weight:950; font-size:13.5px;">Service Type</div>
-            <div style="color:var(--muted); font-size:12px; margin-top:2px;">Rank Boost or Tournament Boost</div>
+            <div style="font-weight:950; font-size:13.5px;">Order Type</div>
+            <div style="color:var(--muted); font-size:12px; margin-top:2px;">Boosts or Accounts</div>
           </div>
-          <div class="toggle" role="tablist" aria-label="Service Type">
-            <div class="btn active" id="rankBoostBtn" role="tab" tabindex="0" aria-selected="true">Rank Boost</div>
-            <div class="btn" id="tourBoostBtn" role="tab" tabindex="0" aria-selected="false">Tournament Boost</div>
+          <div class="toggle" role="tablist" aria-label="Order Type">
+            <div class="btn active" id="boostsBtn" role="tab" tabindex="0" aria-selected="true">Boosts</div>
+            <div class="btn" id="accountsBtn" role="tab" tabindex="0" aria-selected="false">Accounts</div>
           </div>
         </div>
 
-        <div class="grid" id="rankGrid">
-          <div class="field">
-            <label>Current Rank</label>
-            <select id="rankCurrent" class="native-hidden" aria-label="Current Rank"></select>
-            <div class="cs" data-for="rankCurrent" id="csRankCurrent">
+        <div id="boostsPanel">
+          <div class="seg">
+            <div>
+              <div style="font-weight:950; font-size:13.5px;">Completion Method</div>
+              <div style="color:var(--muted); font-size:12px; margin-top:2px;">Solo = We play on your account | Duo = We play together</div>
+            </div>
+            <div class="toggle" role="tablist" aria-label="Completion Method">
+              <div class="btn active" id="soloBtn" role="tab" tabindex="0" aria-selected="true">Solo</div>
+              <div class="btn" id="duoBtn" role="tab" tabindex="0" aria-selected="false">Duo</div>
+            </div>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="field" id="regionField" style="display:none;">
+            <label>Region (Duo Only)</label>
+            <select id="region" class="native-hidden" aria-label="Region"></select>
+            <div class="cs" data-for="region" id="csRegion">
               <button type="button" class="cs-btn" aria-haspopup="listbox" aria-expanded="false"></button>
               <span class="cs-caret" aria-hidden="true"></span>
               <div class="cs-menu" role="listbox"></div>
             </div>
           </div>
 
+          <div style="height:12px"></div>
+
           <div class="field">
-            <label>Desired Rank</label>
-            <select id="rankDesired" class="native-hidden" aria-label="Desired Rank"></select>
-            <div class="cs" data-for="rankDesired" id="csRankDesired">
+            <label>Playlist</label>
+            <select id="playlist" class="native-hidden" aria-label="Playlist"></select>
+            <div class="cs" data-for="playlist" id="csPlaylist">
               <button type="button" class="cs-btn" aria-haspopup="listbox" aria-expanded="false"></button>
               <span class="cs-caret" aria-hidden="true"></span>
               <div class="cs-menu" role="listbox"></div>
             </div>
           </div>
-        </div>
 
-        <div class="grid" id="tourGrid" style="display:none;">
-          <div class="field span-2">
+          <div style="height:12px"></div>
+
+          <div class="grid" id="rankGrid">
+            <div class="field">
+              <label>Current Rank</label>
+              <select id="rankCurrent" class="native-hidden" aria-label="Current Rank"></select>
+              <div class="cs" data-for="rankCurrent" id="csRankCurrent">
+                <button type="button" class="cs-btn" aria-haspopup="listbox" aria-expanded="false"></button>
+                <span class="cs-caret" aria-hidden="true"></span>
+                <div class="cs-menu" role="listbox"></div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Desired Rank</label>
+              <select id="rankDesired" class="native-hidden" aria-label="Desired Rank"></select>
+              <div class="cs" data-for="rankDesired" id="csRankDesired">
+                <button type="button" class="cs-btn" aria-haspopup="listbox" aria-expanded="false"></button>
+                <span class="cs-caret" aria-hidden="true"></span>
+                <div class="cs-menu" role="listbox"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field" id="sslTargetField" style="display:none; margin-top:12px;">
+            <label>SSL Target</label>
+
+            <div class="seg" style="padding:10px; margin-bottom:10px;">
+              <div>
+                <div style="font-weight:950; font-size:13.5px;">Choose</div>
+                <div style="color:var(--muted); font-size:12px; margin-top:2px;">Target MMR or Rewards (+$10)</div>
+              </div>
+              <div class="toggle" role="tablist" aria-label="SSL Target Mode">
+                <div class="btn active" id="sslTargetMmrBtn" role="tab" tabindex="0" aria-selected="true">Target MMR</div>
+                <div class="btn" id="sslRewardsBtn" role="tab" tabindex="0" aria-selected="false">Rewards +$10</div>
+              </div>
+            </div>
+
+            <div id="sslTargetMmrInputWrap">
+              <input class="input" id="sslTargetMmr" type="number" inputmode="numeric" min="1875" max="2100" placeholder="Enter desired SSL MMR (1875-2100)" />
+              <div style="margin-top:8px; color:var(--muted); font-size:12px;">1875 MMR = Base SSL</div>
+            </div>
+
+            <div id="sslRewardsNote" style="display:none; color:var(--muted); font-size:12px;">
+              Rewards option targets base SSL (1875) and adds $10 fee.
+            </div>
+          </div>
+
+          <div class="grid" id="sslBothField" style="display:none; margin-top:12px;">
+            <div class="field">
+              <label>Current SSL MMR</label>
+              <input class="input" id="sslCurrentMmr" type="number" inputmode="numeric" min="1850" max="2100" placeholder="1850-2100" />
+            </div>
+            <div class="field">
+              <label>Desired SSL MMR</label>
+              <input class="input" id="sslDesiredMmr" type="number" inputmode="numeric" min="1875" max="2100" placeholder="1875-2100" />
+            </div>
+          </div>
+
+          <div class="field" id="tournamentField" style="display:none; margin-top:12px;">
             <label>Tournament Goal</label>
-            <select id="tourGoal" class="native-hidden" aria-label="Tournament Goal"></select>
-            <div class="cs" data-for="tourGoal" id="csTourGoal">
+            <select id="tournamentTarget" class="native-hidden" aria-label="Tournament Goal"></select>
+            <div class="cs" data-for="tournamentTarget" id="csTournamentTarget">
               <button type="button" class="cs-btn" aria-haspopup="listbox" aria-expanded="false"></button>
               <span class="cs-caret" aria-hidden="true"></span>
               <div class="cs-menu" role="listbox"></div>
             </div>
           </div>
-        </div>
 
-        <div style="height:12px"></div>
-
-        <div class="seg">
-          <div>
-            <div style="font-weight:950; font-size:13.5px;">Completion Method</div>
-            <div style="color:var(--muted); font-size:12px; margin-top:2px;">Solo or Duo</div>
-          </div>
-          <div class="toggle" role="tablist" aria-label="Completion Method">
-            <div class="btn active" id="soloBtn" role="tab" tabindex="0" aria-selected="true">Solo</div>
-            <div class="btn" id="duoBtn" role="tab" tabindex="0" aria-selected="false">Duo</div>
+          <div class="field" id="customField" style="display:none; margin-top:12px;">
+            <label>Custom Request</label>
+            <textarea class="textarea" id="customDetails" placeholder="Type what you want (custom orders are quoted in Discord)."></textarea>
+            <div style="margin-top:8px; color:var(--muted); font-size:12px;">Price and time will be shown as TBD.</div>
           </div>
         </div>
 
-        <div style="height:12px"></div>
+        <div id="accountsPanel" style="display:none;">
+          <div class="field">
+            <label>Select Account</label>
+            <select id="accountSelect" class="native-hidden" aria-label="Account"></select>
+            <div class="cs" data-for="accountSelect" id="csAccountSelect">
+              <button type="button" class="cs-btn" aria-haspopup="listbox" aria-expanded="false"></button>
+              <span class="cs-caret" aria-hidden="true"></span>
+              <div class="cs-menu" role="listbox"></div>
+            </div>
+          </div>
 
-        <div class="field" id="regionField" style="display:none;">
-          <label>Region (Duo Only)</label>
-          <select id="region" class="native-hidden" aria-label="Region">
-            <option value="NA">North America (NA)</option>
-            <option value="EU">Europe (EU)</option>
-            <option value="SAM">South America (SAM)</option>
-            <option value="OCE">Oceania (OCE)</option>
-            <option value="ASIA">Asia (ASIA)</option>
-            <option value="ME">Middle East (ME)</option>
-            <option value="AF">Africa (AF)</option>
-          </select>
-          <div class="cs" data-for="region" id="csRegion">
-            <button type="button" class="cs-btn" aria-haspopup="listbox" aria-expanded="false"></button>
-            <span class="cs-caret" aria-hidden="true"></span>
-            <div class="cs-menu" role="listbox"></div>
+          <div class="field" style="margin-top:12px;">
+            <label>Info</label>
+            <div style="color:rgba(255,255,255,.88); font-size:13.5px; line-height:1.45;">
+              Images available in Discord - open a ticket to view account images and purchase.
+            </div>
           </div>
         </div>
 
@@ -573,27 +664,37 @@
 
           <div class="sum-row">
             <div class="sum-left">Service</div>
-            <div class="sum-right" id="sumService">Rank Boost</div>
+            <div class="sum-right" id="sumService">Boost</div>
           </div>
 
-          <div class="sum-row">
+          <div class="sum-row" id="sumModeRow">
             <div class="sum-left">Mode</div>
             <div class="sum-right" id="sumMode">Solo</div>
           </div>
 
-          <div class="sum-row" id="sumStartRow">
-            <div class="sum-left" id="sumStartLabel">Start Rank</div>
-            <div class="sum-right" id="sumStart">—</div>
+          <div class="sum-row" id="sumPlaylistRow">
+            <div class="sum-left" id="sumPlaylistLabel">Playlist</div>
+            <div class="sum-right" id="sumPlaylist">2v2</div>
           </div>
 
-          <div class="sum-row">
-            <div class="sum-left" id="sumEndLabel">End Rank</div>
-            <div class="sum-right" id="sumEnd">—</div>
+          <div class="sum-row" id="sumStartRow">
+            <div class="sum-left" id="sumStartLabel">Current</div>
+            <div class="sum-right" id="sumStart">-</div>
+          </div>
+
+          <div class="sum-row" id="sumEndRow">
+            <div class="sum-left" id="sumEndLabel">Desired</div>
+            <div class="sum-right" id="sumEnd">-</div>
+          </div>
+
+          <div class="sum-row" id="sumMmrRow" style="display:none;">
+            <div class="sum-left" id="sumMmrLabel">MMR</div>
+            <div class="sum-right" id="sumMmr">-</div>
           </div>
 
           <div class="sum-row" id="sumRegionRow" style="display:none;">
             <div class="sum-left">Region</div>
-            <div class="sum-right" id="sumRegion">—</div>
+            <div class="sum-right" id="sumRegion">-</div>
           </div>
 
           <div class="sum-divider"></div>
@@ -605,7 +706,7 @@
 
           <div class="eta">
             <div class="clock" aria-hidden="true"></div>
-            <div id="etaText">Estimated Time: —</div>
+            <div id="etaText">Estimated Time: -</div>
           </div>
         </div>
 
@@ -625,69 +726,62 @@
 <script>
   const DISCORD_URL = "https://discord.gg/7w2BWAHSma";
 
-  // Rank Boost pricing targets (Solo NA):
-  // Bronze I -> SSL = $100
-  // GC1 -> SSL = $40
-  // GC3 -> SSL = $20
-  const RANK_BASE_FULL_PRICE = 100;
-  const RANK_FULL_TIME_DAYS = 3;
+  const DUO_MULTIPLIER = 1.20;
+  const EU_DUO_TOTAL_MULTIPLIER = 1.30;
 
-  // Step costs from each rank to the next (length 21, from Bronze I -> Bronze II ... GC3 -> SSL)
-  const RANK_STEP_COST = [
-    1,  1,  1,  1,  2,  2,  2,  2,  3,  3,  3,
-    3,  4,  4,  4,  4,  5,  5, 5, 10, 15
-  ];
-
-  function computeRankBasePrice(fromIdx, toIdx){
-    if (toIdx <= fromIdx) return 0;
-    let total = 0;
-    for (let i = fromIdx; i < toIdx; i++){
-      total += (RANK_STEP_COST[i] ?? 0);
-    }
-    return total;
-  }
-
-  // Tournament Boost (Solo) prices
-  // Requirements:
-  // SSL solo win = $20
-  // GC solo win = $15
-  // Pink title package = $50
-  // Lower the others
-  const TOUR_PRICE_SOLO = {
-    Bronze: 5,
-    Silver: 6,
-    Gold: 7,
-    Platinum: 9,
-    Diamond: 11,
-    Champion: 13,
-    "Grand Champion": 15,
-    "Supersonic Legend": 20
+  const PLAYLIST_MULTIPLIERS = {
+    "1v1": 1.25,
+    "2v2": 1.00,
+    "3v3": 1.00,
+    "4v4": 1.25,
+    "snow day": 1.00,
+    "rumble": 1.25,
+    "tournament": 1.00,
+    "custom": 1.00,
   };
 
-  const TOUR_HOURS_SOLO = {
-    Bronze: 6,
-    Silver: 7,
-    Gold: 8,
-    Platinum: 10,
-    Diamond: 12,
-    Champion: 14,
-    "Grand Champion": 18,
-    "Supersonic Legend": 22
+  const SSL_MMR_PRICE_PER_10 = 1;
+  const SSL_BASE_MMR = 1875;
+  const SSL_CURRENT_MIN = 1850;
+  const SSL_TARGET_MIN = 1875;
+  const SSL_MMR_MAX = 2100;
+  const SSL_REWARDS_FEE = 10;
+
+  const TOURNAMENT_PRICES = {
+    "bronze": 5,
+    "silver": 6,
+    "gold": 7,
+    "plat": 9,
+    "diamond": 11,
+    "champ": 13,
+    "grand champ": 15,
+    "ssl": 20,
+    "3x ssl tournament winner": 50,
+  };
+  const TOURNAMENT_LABELS = {
+    "bronze": "Bronze Tournament Winner",
+    "silver": "Silver Tournament Winner",
+    "gold": "Gold Tournament Winner",
+    "plat": "Platinum Tournament Winner",
+    "diamond": "Diamond Tournament Winner",
+    "champ": "Champion Tournament Winner",
+    "grand champ": "Grand Champion Tournament Winner",
+    "ssl": "Supersonic Legend Tournament Winner",
+    "3x ssl tournament winner": "3x SSL Tournament Winner",
   };
 
-  const PINK_SSL_WINS = 3;
-  const PINK_SSL_PRICE_SOLO = 50;
+  const GC2_CAP_PLAYLISTS = new Set(["1v1", "4v4", "rumble"]);
 
-  // Duo multipliers
-  // Rank: Duo = +30%, and non-NA adds +20% more (total +50%)
-  function rankDuoMultiplier(regionValue){
-    return regionValue === "NA" ? 1.30 : 1.50;
-  }
-
-  // Tournament: Duo = +50%, and non-NA is +75%
-  function tournamentDuoMultiplier(regionValue){
-    return regionValue === "NA" ? 1.50 : 1.75;
-  }
+  const ACCOUNTS = {
+    "stacked_ranked_ready": { title: "Stacked Ranked Ready Account", price: 50, delivery_hours: 24 },
+    "ranked_ready": { title: "Ranked Ready Account", price: 3, delivery_hours: 12 },
+    "s21_ssl_2v2_no_rewards": { title: "S21 SSL 2v2 No Rewards", price: 20, delivery_hours: 24 },
+    "s21_ssl_2v2_rewards": { title: "S21 SSL 2v2 + Rewards", price: 30, delivery_hours: 24 },
+    "s21_ssl_2v2_3v3_no_rewards": { title: "S21 SSL 2v2 + 3v3 No Rewards", price: 45, delivery_hours: 48 },
+    "s21_ssl_2v2_3v3_rewards": { title: "S21 SSL 2v2 + 3v3 + Rewards", price: 60, delivery_hours: 48 },
+    "s21_ssl_2v2_3v3_rewards_ssl_title": { title: "S21 SSL 2v2 + 3v3 + Rewards + SSL Title", price: 75, delivery_hours: 72 },
+    "s21_ssl_2v2_3v3_rewards_pink_ssl_title": { title: "S21 SSL 2v2 + 3v3 + Rewards + Pink SSL Title", price: 100, delivery_hours: 72 },
+  };
 
   const ranks = [
     "Bronze I","Bronze II","Bronze III",
@@ -699,41 +793,221 @@
     "Grand Champion I","Grand Champion II","Grand Champion III",
     "Supersonic Legend"
   ];
+  const SSL_IDX = ranks.length - 1;
+  const GC2_IDX = ranks.indexOf("Grand Champion II");
 
-  function tierOfRank(rankName){
-    if (rankName.startsWith("Bronze")) return "Bronze";
-    if (rankName.startsWith("Silver")) return "Silver";
-    if (rankName.startsWith("Gold")) return "Gold";
-    if (rankName.startsWith("Platinum")) return "Platinum";
-    if (rankName.startsWith("Diamond")) return "Diamond";
-    if (rankName.startsWith("Champion")) return "Champion";
-    if (rankName.startsWith("Grand Champion")) return "Grand Champion";
-    return "Supersonic Legend";
-  }
-
-  const tourOptions = [
-    { label: "Bronze Tournament Win (1x)", tier: "Bronze", wins: 1 },
-    { label: "Silver Tournament Win (1x)", tier: "Silver", wins: 1 },
-    { label: "Gold Tournament Win (1x)", tier: "Gold", wins: 1 },
-    { label: "Platinum Tournament Win (1x)", tier: "Platinum", wins: 1 },
-    { label: "Diamond Tournament Win (1x)", tier: "Diamond", wins: 1 },
-    { label: "Champion Tournament Win (1x)", tier: "Champion", wins: 1 },
-    { label: "Grand Champion Tournament Win (1x)", tier: "Grand Champion", wins: 1 },
-    { label: "SSL Tournament Win (1x)", tier: "Supersonic Legend", wins: 1 },
-    { label: "Pink SSL Tournament Win (3x)", tier: "Supersonic Legend", wins: PINK_SSL_WINS, pink: true }
+  const TRANSITION_PRICES = [
+    1, 1, 1, 1,
+    2, 2, 2, 2,
+    3, 3, 3, 3,
+    4, 4, 4, 4,
+    5, 5, 5,
+    10, 15
   ];
 
-  function formatETAFromDays(days){
-    if (days <= 0) return "—";
-    if (days < 1){
-      const hoursRaw = days * 24;
-      const hours = Math.max(6, Math.round(hoursRaw / 6) * 6);
-      return `${hours} Hours`;
-    }
-    const d = Math.max(1, Math.round(days * 2) / 2);
-    const pretty = Number.isInteger(d) ? String(d) : d.toFixed(1);
-    return `${pretty} Day${d === 1 ? "" : "s"}`;
+  const BASE_RANKS = ["bronze", "silver", "gold", "plat", "diamond", "champ", "grand champ", "ssl"];
+  const SSL_ETA_BY_BASE = {
+    "grand champ": 1,
+    "champ": 2,
+    "diamond": 3,
+    "plat": 4,
+    "gold": 5,
+    "silver": 6,
+    "bronze": 7,
+    "ssl": 1,
+  };
+
+  function baseOfRankIndex(idx){
+    const name = ranks[idx] || "";
+    if (name.startsWith("Bronze")) return "bronze";
+    if (name.startsWith("Silver")) return "silver";
+    if (name.startsWith("Gold")) return "gold";
+    if (name.startsWith("Platinum")) return "plat";
+    if (name.startsWith("Diamond")) return "diamond";
+    if (name.startsWith("Champion") && !name.startsWith("Grand Champion")) return "champ";
+    if (name.startsWith("Grand Champion")) return "grand champ";
+    return "ssl";
   }
+
+  function baseRankIndex(base){
+    return BASE_RANKS.indexOf(base);
+  }
+
+  function playlistIsGc2Capped(pl){
+    return GC2_CAP_PLAYLISTS.has((pl || "").toLowerCase());
+  }
+
+  function ceilInt(n){
+    return Math.ceil(n);
+  }
+
+  function calculateBasePrice(currentIdx, desiredIdx){
+    if (desiredIdx <= currentIdx) throw new Error("Desired rank must be higher than current rank.");
+    let total = 0;
+    for (let i = currentIdx; i < desiredIdx; i++){
+      total += (TRANSITION_PRICES[i] ?? 0);
+    }
+    return total;
+  }
+
+  function calculateSslToSslPrice(currentMmr, desiredMmr){
+    const delta = desiredMmr - currentMmr;
+    if (delta <= 0) throw new Error("Desired MMR must be higher than current MMR.");
+    const steps = Math.ceil(delta / 10);
+    return Math.max(1, steps * SSL_MMR_PRICE_PER_10);
+  }
+
+  function calculateSslTargetExtraPrice(desiredMmr){
+    if (desiredMmr <= SSL_BASE_MMR) return 0;
+    const steps = Math.ceil((desiredMmr - SSL_BASE_MMR) / 10);
+    return Math.max(0, steps * SSL_MMR_PRICE_PER_10);
+  }
+
+  function calculateFinalBoostPrice({ playlist, method, region, currentIdx, desiredIdx, currentMmr, desiredMmr, sslRewards }){
+    const pl = (playlist || "").toLowerCase();
+    const m  = (method || "solo").toLowerCase();
+
+    let basePrice = 0;
+    let extraFee = 0;
+
+    if (currentIdx === SSL_IDX && desiredIdx === SSL_IDX){
+      if (currentMmr == null || desiredMmr == null) throw new Error("MMR required for SSL to higher SSL boost.");
+      basePrice = calculateSslToSslPrice(currentMmr, desiredMmr);
+      extraFee = 0;
+    } else if (desiredIdx === SSL_IDX && currentIdx !== SSL_IDX){
+      basePrice = calculateBasePrice(currentIdx, SSL_IDX);
+      if (sslRewards){
+        desiredMmr = SSL_BASE_MMR;
+        extraFee = SSL_REWARDS_FEE;
+      } else {
+        if (desiredMmr == null) throw new Error("Desired MMR required for SSL target.");
+        basePrice += calculateSslTargetExtraPrice(desiredMmr);
+        extraFee = 0;
+      }
+    } else {
+      basePrice = calculateBasePrice(currentIdx, desiredIdx);
+      extraFee = 0;
+    }
+
+    let price = Number(basePrice);
+    price *= (PLAYLIST_MULTIPLIERS[pl] ?? 1.0);
+
+    if (m === "duo"){
+      if ((region || "").toLowerCase() === "eu"){
+        price *= EU_DUO_TOTAL_MULTIPLIER;
+      } else {
+        price *= DUO_MULTIPLIER;
+      }
+    }
+
+    price += Number(extraFee);
+    return ceilInt(price);
+  }
+
+  function calculateTournamentPrice({ method, region, targetKey }){
+    const base = TOURNAMENT_PRICES[targetKey];
+    if (base == null) throw new Error("Invalid tournament target.");
+    let price = Number(base);
+
+    if ((method || "").toLowerCase() === "duo"){
+      const r = (region || "").toLowerCase();
+      if (r.startsWith("na")) price *= 1.5;
+      else price *= 2.0;
+    }
+
+    return ceilInt(price);
+  }
+
+  function estimateDaysForBoost(currentIdx, desiredIdx){
+    const curBase = baseOfRankIndex(currentIdx);
+    const desBase = baseOfRankIndex(desiredIdx);
+
+    if (desBase === "ssl"){
+      if (curBase === "ssl") return 1;
+      return SSL_ETA_BY_BASE[curBase] ?? 1;
+    }
+
+    const curMajor = baseRankIndex(curBase);
+    const desMajor = baseRankIndex(desBase);
+    return Math.max(1, desMajor - curMajor);
+  }
+
+  function formatEtaText({ tbd=false, days=null, hours=null }){
+    if (tbd) return "Estimated Time: TBD";
+    if (hours != null) return `Estimated Time: ${hours}h`;
+    if (days == null) return "Estimated Time: -";
+    return `Estimated Time: ${days} day${days === 1 ? "" : "s"}`;
+  }
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  let orderType = "BOOST";
+  let method = "Solo";
+  let sslTargetMode = "MMR";
+
+  const boostsBtn = document.getElementById("boostsBtn");
+  const accountsBtn = document.getElementById("accountsBtn");
+
+  const boostsPanel = document.getElementById("boostsPanel");
+  const accountsPanel = document.getElementById("accountsPanel");
+
+  const soloBtn = document.getElementById("soloBtn");
+  const duoBtn  = document.getElementById("duoBtn");
+
+  const regionField = document.getElementById("regionField");
+  const region = document.getElementById("region");
+
+  const playlist = document.getElementById("playlist");
+
+  const rankGrid = document.getElementById("rankGrid");
+  const rankCurrent = document.getElementById("rankCurrent");
+  const rankDesired = document.getElementById("rankDesired");
+
+  const sslTargetField = document.getElementById("sslTargetField");
+  const sslTargetMmrBtn = document.getElementById("sslTargetMmrBtn");
+  const sslRewardsBtn = document.getElementById("sslRewardsBtn");
+  const sslTargetMmrInputWrap = document.getElementById("sslTargetMmrInputWrap");
+  const sslRewardsNote = document.getElementById("sslRewardsNote");
+  const sslTargetMmr = document.getElementById("sslTargetMmr");
+
+  const sslBothField = document.getElementById("sslBothField");
+  const sslCurrentMmr = document.getElementById("sslCurrentMmr");
+  const sslDesiredMmr = document.getElementById("sslDesiredMmr");
+
+  const tournamentField = document.getElementById("tournamentField");
+  const tournamentTarget = document.getElementById("tournamentTarget");
+
+  const customField = document.getElementById("customField");
+  const customDetails = document.getElementById("customDetails");
+
+  const accountSelect = document.getElementById("accountSelect");
+
+  const sumService = document.getElementById("sumService");
+  const sumModeRow = document.getElementById("sumModeRow");
+  const sumMode = document.getElementById("sumMode");
+  const sumPlaylistRow = document.getElementById("sumPlaylistRow");
+  const sumPlaylistLabel = document.getElementById("sumPlaylistLabel");
+  const sumPlaylist = document.getElementById("sumPlaylist");
+  const sumStartRow = document.getElementById("sumStartRow");
+  const sumEndRow = document.getElementById("sumEndRow");
+  const sumStartLabel = document.getElementById("sumStartLabel");
+  const sumEndLabel = document.getElementById("sumEndLabel");
+  const sumStart = document.getElementById("sumStart");
+  const sumEnd = document.getElementById("sumEnd");
+
+  const sumMmrRow = document.getElementById("sumMmrRow");
+  const sumMmrLabel = document.getElementById("sumMmrLabel");
+  const sumMmr = document.getElementById("sumMmr");
+
+  const sumRegionRow = document.getElementById("sumRegionRow");
+  const sumRegion = document.getElementById("sumRegion");
+
+  const sumPrice = document.getElementById("sumPrice");
+  const etaText = document.getElementById("etaText");
+
+  const statusBox = document.getElementById("statusBox");
+  const checkoutBtn = document.getElementById("checkoutBtn");
+  const joinDiscordBtn = document.getElementById("joinDiscordBtn");
 
   let audioCtx = null;
   function sfx(type="tap"){
@@ -763,79 +1037,14 @@
     }catch(e){}
   }
 
-  const rankBoostBtn = document.getElementById("rankBoostBtn");
-  const tourBoostBtn = document.getElementById("tourBoostBtn");
-
-  const rankGrid = document.getElementById("rankGrid");
-  const tourGrid = document.getElementById("tourGrid");
-
-  const rankCurrent = document.getElementById("rankCurrent");
-  const rankDesired = document.getElementById("rankDesired");
-
-  const tourGoal = document.getElementById("tourGoal");
-
-  const soloBtn = document.getElementById("soloBtn");
-  const duoBtn  = document.getElementById("duoBtn");
-
-  const regionField = document.getElementById("regionField");
-  const region = document.getElementById("region");
-
-  const sumService = document.getElementById("sumService");
-  const sumMode = document.getElementById("sumMode");
-  const sumStartRow = document.getElementById("sumStartRow");
-  const sumStartLabel = document.getElementById("sumStartLabel");
-  const sumEndLabel = document.getElementById("sumEndLabel");
-  const sumStart = document.getElementById("sumStart");
-  const sumEnd = document.getElementById("sumEnd");
-
-  const sumRegionRow = document.getElementById("sumRegionRow");
-  const sumRegion = document.getElementById("sumRegion");
-
-  const sumPrice = document.getElementById("sumPrice");
-  const etaText = document.getElementById("etaText");
-
-  const statusBox = document.getElementById("statusBox");
-  const checkoutBtn = document.getElementById("checkoutBtn");
-  const joinDiscordBtn = document.getElementById("joinDiscordBtn");
-
-  document.getElementById("year").textContent = new Date().getFullYear();
-
-  let serviceType = "RANK";
-  let method = "Solo";
-
-  function populateSelect(selectEl, list){
-    selectEl.innerHTML = "";
-    list.forEach((v, idx) => {
-      const opt = document.createElement("option");
-      opt.value = String(idx);
-      opt.textContent = v;
-      selectEl.appendChild(opt);
-    });
-  }
-  populateSelect(rankCurrent, ranks);
-  populateSelect(rankDesired, ranks);
-
-  function populateTourGoal(){
-    tourGoal.innerHTML = "";
-    tourOptions.forEach((o, idx) => {
-      const opt = document.createElement("option");
-      opt.value = String(idx);
-      opt.textContent = o.label;
-      tourGoal.appendChild(opt);
-    });
-  }
-  populateTourGoal();
-
-  rankCurrent.value = "0";
-  rankDesired.value = "3";
-  tourGoal.value = "7";
-
   function closeAllCustomSelects(except=null){
     document.querySelectorAll(".cs.open").forEach(cs => {
       if (except && cs === except) return;
       cs.classList.remove("open");
       const b = cs.querySelector(".cs-btn");
       if (b) b.setAttribute("aria-expanded","false");
+      const field = cs.closest(".field");
+      if (field) field.classList.remove("field-open");
     });
   }
 
@@ -844,13 +1053,16 @@
     const native = document.getElementById(selectId);
     const btn = csRoot.querySelector(".cs-btn");
     const menu = csRoot.querySelector(".cs-menu");
+    const field = csRoot.closest(".field");
 
     function close(){
       csRoot.classList.remove("open");
       btn.setAttribute("aria-expanded","false");
+      if (field) field.classList.remove("field-open");
     }
     function open(){
       closeAllCustomSelects(csRoot);
+      if (field) field.classList.add("field-open");
       csRoot.classList.add("open");
       btn.setAttribute("aria-expanded","true");
       const sel = menu.querySelector('[aria-selected="true"]');
@@ -913,31 +1125,147 @@
     return { render, native };
   }
 
+  function setSelectOptions(selectEl, options){
+    const prev = selectEl.value;
+    selectEl.innerHTML = "";
+    for (const o of options){
+      const opt = document.createElement("option");
+      opt.value = String(o.value);
+      opt.textContent = o.label;
+      opt.disabled = !!o.disabled;
+      selectEl.appendChild(opt);
+    }
+    const still = Array.from(selectEl.options).find(o => o.value === prev && !o.disabled);
+    if (still){
+      selectEl.value = prev;
+    } else {
+      const firstValid = Array.from(selectEl.options).find(o => !o.disabled);
+      if (firstValid) selectEl.value = firstValid.value;
+    }
+  }
+
+  function populateRegions(){
+    setSelectOptions(region, [
+      { value:"NA East", label:"NA East" },
+      { value:"NA West", label:"NA West" },
+      { value:"EU",      label:"EU" },
+      { value:"OCE",     label:"OCE" },
+      { value:"Asia",    label:"Asia" },
+      { value:"Other",   label:"Other" },
+    ]);
+  }
+
+  function populatePlaylist(){
+    setSelectOptions(playlist, [
+      { value:"1v1", label:"1v1" },
+      { value:"2v2", label:"2v2" },
+      { value:"3v3", label:"3v3" },
+      { value:"4v4", label:"4v4" },
+      { value:"snow day", label:"Snow Day" },
+      { value:"rumble", label:"Rumble" },
+      { value:"tournament", label:"Tournament" },
+      { value:"custom", label:"Custom" },
+    ]);
+  }
+
+  function populateTournamentTargets(){
+    const keys = [
+      "bronze","silver","gold","plat","diamond","champ","grand champ","ssl","3x ssl tournament winner"
+    ];
+    setSelectOptions(tournamentTarget, keys.map(k => ({
+      value: k,
+      label: (TOURNAMENT_LABELS[k] ?? k)
+    })));
+  }
+
+  function populateAccounts(){
+    const opts = Object.entries(ACCOUNTS).map(([key, v]) => ({
+      value: key,
+      label: `${v.title} - $${v.price} - ${v.delivery_hours}h`
+    }));
+    setSelectOptions(accountSelect, opts);
+  }
+
+  function populateRankCurrent(){
+    const pl = (playlist.value || "").toLowerCase();
+    const capped = playlistIsGc2Capped(pl);
+    const maxIdx = capped ? GC2_IDX : SSL_IDX;
+
+    const opts = [];
+    for (let i = 0; i <= maxIdx; i++){
+      opts.push({ value: i, label: ranks[i] });
+    }
+    setSelectOptions(rankCurrent, opts);
+
+    const curIdx = parseInt(rankCurrent.value, 10);
+    if (curIdx > maxIdx){
+      rankCurrent.value = String(maxIdx);
+    }
+  }
+
+  function populateRankDesired(){
+    const pl = (playlist.value || "").toLowerCase();
+    const capped = playlistIsGc2Capped(pl);
+    const maxIdx = capped ? GC2_IDX : SSL_IDX;
+
+    const curIdx = parseInt(rankCurrent.value, 10);
+
+    const opts = [];
+
+    if (curIdx === SSL_IDX){
+      opts.push({ value: SSL_IDX, label: ranks[SSL_IDX] });
+    } else {
+      for (let i = 0; i <= maxIdx; i++){
+        const disabled = !(i > curIdx);
+        opts.push({ value: i, label: ranks[i], disabled });
+      }
+    }
+
+    setSelectOptions(rankDesired, opts);
+  }
+
+  populateRegions();
+  populatePlaylist();
+  populateTournamentTargets();
+  populateAccounts();
+
+  playlist.value = "2v2";
+  rankCurrent.value = "0";
+  rankDesired.value = "3";
+  region.value = "NA East";
+  tournamentTarget.value = "ssl";
+  accountSelect.value = Object.keys(ACCOUNTS)[0];
+
+  populateRankCurrent();
+  populateRankDesired();
+
+  const csRegion = buildCustomSelect(document.getElementById("csRegion"));
+  const csPlaylist = buildCustomSelect(document.getElementById("csPlaylist"));
   const csRankCurrent = buildCustomSelect(document.getElementById("csRankCurrent"));
   const csRankDesired = buildCustomSelect(document.getElementById("csRankDesired"));
-  const csTourGoal    = buildCustomSelect(document.getElementById("csTourGoal"));
-  const csRegion      = buildCustomSelect(document.getElementById("csRegion"));
+  const csTournamentTarget = buildCustomSelect(document.getElementById("csTournamentTarget"));
+  const csAccountSelect = buildCustomSelect(document.getElementById("csAccountSelect"));
 
   function setStatus(kind, text){
     statusBox.className = "status " + kind;
     statusBox.textContent = text;
   }
 
-  function setService(next){
-    serviceType = next;
+  function setOrderType(next){
+    orderType = next;
     closeAllCustomSelects();
     sfx("switch");
 
-    const isRank = serviceType === "RANK";
-    rankBoostBtn.classList.toggle("active", isRank);
-    tourBoostBtn.classList.toggle("active", !isRank);
-    rankBoostBtn.setAttribute("aria-selected", String(isRank));
-    tourBoostBtn.setAttribute("aria-selected", String(!isRank));
+    const isBoost = (orderType === "BOOST");
+    boostsBtn.classList.toggle("active", isBoost);
+    accountsBtn.classList.toggle("active", !isBoost);
+    boostsBtn.setAttribute("aria-selected", String(isBoost));
+    accountsBtn.setAttribute("aria-selected", String(!isBoost));
 
-    rankGrid.style.display = isRank ? "grid" : "none";
-    tourGrid.style.display = isRank ? "none" : "grid";
+    boostsPanel.style.display = isBoost ? "block" : "none";
+    accountsPanel.style.display = isBoost ? "none" : "block";
 
-    sumService.textContent = isRank ? "Rank Boost" : "Tournament Boost";
+    sumService.textContent = isBoost ? "Boost" : "Account";
 
     updateVisibility();
     update();
@@ -960,133 +1288,405 @@
     update();
   }
 
+  function setSslTargetMode(next){
+    sslTargetMode = next;
+    sfx("switch");
+
+    const isMmr = (sslTargetMode === "MMR");
+    sslTargetMmrBtn.classList.toggle("active", isMmr);
+    sslRewardsBtn.classList.toggle("active", !isMmr);
+    sslTargetMmrBtn.setAttribute("aria-selected", String(isMmr));
+    sslRewardsBtn.setAttribute("aria-selected", String(!isMmr));
+
+    sslTargetMmrInputWrap.style.display = isMmr ? "block" : "none";
+    sslRewardsNote.style.display = isMmr ? "none" : "block";
+
+    update();
+  }
+
   function updateVisibility(){
-    const isDuo = method === "Duo";
-    const isRank = serviceType === "RANK";
+    const isBoost = (orderType === "BOOST");
+    const isDuo = (method === "Duo");
 
-    regionField.style.display = isDuo ? "flex" : "none";
-    sumRegionRow.style.display = isDuo ? "flex" : "none";
+    sumModeRow.style.display = isBoost ? "flex" : "none";
 
-    if (isRank){
-      sumStartLabel.textContent = "Start Rank";
-      sumEndLabel.textContent = "End Rank";
-      sumStartRow.style.display = "flex";
-    } else {
-      sumEndLabel.textContent = "Tournament Goal";
+    regionField.style.display = (isBoost && isDuo) ? "flex" : "none";
+    sumRegionRow.style.display = (isBoost && isDuo) ? "flex" : "none";
+
+    if (!isBoost){
+      sumPlaylistLabel.textContent = "Account";
+      sumPlaylistRow.style.display = "flex";
       sumStartRow.style.display = "none";
+      sumEndRow.style.display = "none";
+      sumMmrRow.style.display = "none";
+      tournamentField.style.display = "none";
+      customField.style.display = "none";
+      sslTargetField.style.display = "none";
+      sslBothField.style.display = "none";
+      rankGrid.style.display = "none";
+      return;
+    }
+
+    sumPlaylistLabel.textContent = "Playlist";
+    sumPlaylistRow.style.display = "flex";
+
+    const pl = (playlist.value || "").toLowerCase();
+    const isTournament = pl === "tournament";
+    const isCustom = pl === "custom";
+
+    tournamentField.style.display = isTournament ? "flex" : "none";
+    customField.style.display = isCustom ? "flex" : "none";
+
+    rankGrid.style.display = (!isTournament && !isCustom) ? "grid" : "none";
+
+    const curIdx = parseInt(rankCurrent.value, 10);
+    const desIdx = parseInt(rankDesired.value, 10);
+
+    const showSslTarget = (!isTournament && !isCustom && desIdx === SSL_IDX && curIdx !== SSL_IDX);
+    const showSslBoth = (!isTournament && !isCustom && desIdx === SSL_IDX && curIdx === SSL_IDX);
+
+    sslTargetField.style.display = showSslTarget ? "block" : "none";
+    sslBothField.style.display = showSslBoth ? "grid" : "none";
+
+    sumStartRow.style.display = (!isTournament && !isCustom) ? "flex" : "none";
+    sumEndRow.style.display = "flex";
+
+    if (isTournament){
+      sumStartRow.style.display = "none";
+      sumEndLabel.textContent = "Tournament";
+    } else if (isCustom){
+      sumStartRow.style.display = "none";
+      sumEndLabel.textContent = "Custom";
+    } else {
+      sumStartLabel.textContent = "Current";
+      sumEndLabel.textContent = "Desired";
     }
   }
 
-  function computeTournamentTotalAndETA(tier, wins, isPink){
-    const hoursPerWin = TOUR_HOURS_SOLO[tier];
+  function getBoostQuote(){
+    const pl = (playlist.value || "").toLowerCase();
+    const isDuo = (method === "Duo");
+    const regionVal = region.value || "";
 
-    if (isPink){
-      const hours = (hoursPerWin * wins) * 0.90;
-      return { total: PINK_SSL_PRICE_SOLO, etaDays: hours / 24 };
+    sumPlaylist.textContent = (playlist.value === "snow day") ? "Snow Day" : (playlist.value || "-");
+
+    if (isDuo){
+      sumRegion.textContent = regionVal;
     }
 
-    const single = TOUR_PRICE_SOLO[tier];
-    const total = single * wins;
+    if (pl === "tournament"){
+      const targetKey = tournamentTarget.value;
+      const label = TOURNAMENT_LABELS[targetKey] ?? targetKey;
+      sumEnd.textContent = label;
+      sumMmrRow.style.display = "none";
 
-    const hours = hoursPerWin * wins;
-    return { total, etaDays: hours / 24 };
-  }
+      const price = calculateTournamentPrice({
+        method: method.toLowerCase(),
+        region: regionVal,
+        targetKey
+      });
 
-  function computeFinal(){
-    const isDuo = method === "Duo";
-
-    if (serviceType === "RANK"){
-      const fromIdx = parseInt(rankCurrent.value, 10);
-      const toIdx = parseInt(rankDesired.value, 10);
-      const fromName = ranks[fromIdx] || "—";
-      const toName = ranks[toIdx] || "—";
-
-      const basePrice = computeRankBasePrice(fromIdx, toIdx);
-
-      let mult = 1.0;
-      if (isDuo) mult = rankDuoMultiplier(region.value);
-
-      const finalRaw = basePrice * mult;
-      const finalWhole = (toIdx > fromIdx) ? Math.max(1, Math.round(finalRaw)) : 0;
-
-      const fraction = (RANK_BASE_FULL_PRICE > 0) ? (basePrice / RANK_BASE_FULL_PRICE) : 0;
-      const etaDays = RANK_FULL_TIME_DAYS * fraction;
+      const days = 3;
 
       return {
-        ok: toIdx > fromIdx,
-        startText: fromName,
-        endText: toName,
-        price: finalWhole,
-        etaDays
+        ok: true,
+        price,
+        eta: { days },
+        status: `Estimate ready: $${price} • Tournament • ${isDuo ? "Duo" : "Solo"}.`
       };
     }
 
-    const optIdx = parseInt(tourGoal.value, 10);
-    const opt = tourOptions[optIdx];
+    if (pl === "custom"){
+      const text = (customDetails.value || "").trim();
+      sumEnd.textContent = text ? "Custom request entered" : "-";
+      sumMmrRow.style.display = "none";
 
-    const { total, etaDays } = computeTournamentTotalAndETA(opt.tier, opt.wins, !!opt.pink);
+      if (!text){
+        return {
+          ok: false,
+          priceText: "TBD",
+          eta: { tbd: true },
+          status: "Enter your custom request to continue."
+        };
+      }
 
-    let mult = 1.0;
-    if (isDuo) mult = tournamentDuoMultiplier(region.value);
+      return {
+        ok: true,
+        priceText: "TBD",
+        eta: { tbd: true },
+        status: "Custom request ready - pricing is quoted in Discord."
+      };
+    }
 
-    const finalRaw = total * mult;
-    const finalWhole = Math.max(1, Math.round(finalRaw));
+    const curIdx = parseInt(rankCurrent.value, 10);
+    const desIdx = parseInt(rankDesired.value, 10);
+
+    const capped = playlistIsGc2Capped(pl);
+    const maxIdx = capped ? GC2_IDX : SSL_IDX;
+
+    if (curIdx > maxIdx || desIdx > maxIdx){
+      return {
+        ok: false,
+        price: 0,
+        eta: { days: null },
+        status: "This playlist is capped at Grand Champion II."
+      };
+    }
+
+    if (curIdx === SSL_IDX && desIdx === SSL_IDX){
+      const c = Number(sslCurrentMmr.value);
+      const d = Number(sslDesiredMmr.value);
+
+      sumStart.textContent = ranks[curIdx];
+      sumEnd.textContent = ranks[desIdx];
+      sumMmrRow.style.display = "flex";
+      sumMmrLabel.textContent = "MMR";
+      sumMmr.textContent = `Current: ${sslCurrentMmr.value || "-"} | Desired: ${sslDesiredMmr.value || "-"}`;
+
+      if (!Number.isFinite(c) || !Number.isFinite(d)){
+        return { ok:false, price:0, eta:{days:null}, status:`Enter your current and desired SSL MMR.` };
+      }
+      if (c < SSL_CURRENT_MIN || c > SSL_MMR_MAX){
+        return { ok:false, price:0, eta:{days:null}, status:`Current MMR must be between ${SSL_CURRENT_MIN} and ${SSL_MMR_MAX}.` };
+      }
+      if (d < SSL_TARGET_MIN || d > SSL_MMR_MAX){
+        return { ok:false, price:0, eta:{days:null}, status:`Desired MMR must be between ${SSL_TARGET_MIN} and ${SSL_MMR_MAX}.` };
+      }
+      if (d <= c){
+        return { ok:false, price:0, eta:{days:null}, status:`Desired MMR must be higher than current MMR.` };
+      }
+
+      const price = calculateFinalBoostPrice({
+        playlist: pl,
+        method: method.toLowerCase(),
+        region: regionVal,
+        currentIdx: curIdx,
+        desiredIdx: desIdx,
+        currentMmr: c,
+        desiredMmr: d,
+        sslRewards: false
+      });
+
+      let days = estimateDaysForBoost(curIdx, desIdx);
+      if (isDuo) days *= 2;
+
+      return {
+        ok:true,
+        price,
+        eta:{ days },
+        status:`Estimate ready: $${price} • ${sumPlaylist.textContent} • ${isDuo ? "Duo" : "Solo"}.`
+      };
+    }
+
+    if (desIdx === SSL_IDX && curIdx !== SSL_IDX){
+      sumStart.textContent = ranks[curIdx];
+      sumEnd.textContent = ranks[desIdx];
+
+      const rewards = (sslTargetMode === "REWARDS");
+      let desiredMmr = null;
+
+      if (rewards){
+        sumMmrRow.style.display = "flex";
+        sumMmrLabel.textContent = "SSL Target";
+        sumMmr.textContent = "Rewards (Base SSL + SSL Rewards)";
+        desiredMmr = SSL_BASE_MMR;
+      } else {
+        const d = Number(sslTargetMmr.value);
+        sumMmrRow.style.display = "flex";
+        sumMmrLabel.textContent = "Target SSL MMR";
+        sumMmr.textContent = sslTargetMmr.value ? String(sslTargetMmr.value) : "-";
+
+        if (!Number.isFinite(d)){
+          return { ok:false, price:0, eta:{days:null}, status:`Enter your target SSL MMR (${SSL_TARGET_MIN}-${SSL_MMR_MAX}).` };
+        }
+        if (d < SSL_TARGET_MIN || d > SSL_MMR_MAX){
+          return { ok:false, price:0, eta:{days:null}, status:`Target SSL MMR must be between ${SSL_TARGET_MIN} and ${SSL_MMR_MAX}.` };
+        }
+        desiredMmr = d;
+      }
+
+      const price = calculateFinalBoostPrice({
+        playlist: pl,
+        method: method.toLowerCase(),
+        region: regionVal,
+        currentIdx: curIdx,
+        desiredIdx: desIdx,
+        currentMmr: null,
+        desiredMmr,
+        sslRewards: rewards
+      });
+
+      let days = estimateDaysForBoost(curIdx, desIdx);
+      if (isDuo) days *= 2;
+
+      return {
+        ok:true,
+        price,
+        eta:{ days },
+        status:`Estimate ready: $${price} • ${sumPlaylist.textContent} • ${isDuo ? "Duo" : "Solo"}.`
+      };
+    }
+
+    sumMmrRow.style.display = "none";
+    sumStart.textContent = ranks[curIdx];
+    sumEnd.textContent = ranks[desIdx];
+
+    if (desIdx <= curIdx){
+      return {
+        ok:false,
+        price:0,
+        eta:{days:null},
+        status:"Desired rank must be higher than current rank."
+      };
+    }
+
+    if (capped && curIdx === GC2_IDX){
+      return {
+        ok:false,
+        price:0,
+        eta:{days:null},
+        status:"For this playlist, the max rank is Grand Champion II."
+      };
+    }
+
+    const price = calculateFinalBoostPrice({
+      playlist: pl,
+      method: method.toLowerCase(),
+      region: regionVal,
+      currentIdx: curIdx,
+      desiredIdx: desIdx,
+      currentMmr: null,
+      desiredMmr: null,
+      sslRewards: false
+    });
+
+    let days = estimateDaysForBoost(curIdx, desIdx);
+    if (isDuo) days *= 2;
 
     return {
-      ok: true,
-      startText: "",
-      endText: opt.label,
-      price: finalWhole,
-      etaDays
+      ok:true,
+      price,
+      eta:{ days },
+      status:`Estimate ready: $${price} • ${sumPlaylist.textContent} • ${isDuo ? "Duo" : "Solo"}.`
+    };
+  }
+
+  function getAccountQuote(){
+    const key = accountSelect.value;
+    const acc = ACCOUNTS[key];
+    if (!acc){
+      return { ok:false, price:0, eta:{hours:null}, status:"Select an account." };
+    }
+
+    sumPlaylistLabel.textContent = "Account";
+    sumPlaylist.textContent = acc.title;
+
+    const price = acc.price;
+    const hours = acc.delivery_hours;
+
+    return {
+      ok:true,
+      price,
+      eta:{ hours },
+      status:`Account ready: $${price} • Delivery ${hours}h. Images available in Discord.`
     };
   }
 
   function update(){
-    const res = computeFinal();
+    updateVisibility();
 
-    if (serviceType === "RANK"){
-      sumStart.textContent = res.startText;
-      sumEnd.textContent = res.endText;
+    if (orderType === "BOOST"){
+      sumService.textContent = "Boost";
+      sumMode.textContent = (method === "Duo") ? "Duo" : "Solo";
     } else {
-      sumEnd.textContent = res.endText;
+      sumService.textContent = "Account";
     }
 
-    if (method === "Duo"){
-      const regionLabelMap = {
-        NA:"North America (NA)", EU:"Europe (EU)", SAM:"South America (SAM)",
-        OCE:"Oceania (OCE)", ASIA:"Asia (ASIA)", ME:"Middle East (ME)", AF:"Africa (AF)"
-      };
-      sumRegion.textContent = regionLabelMap[region.value] || region.value;
+    let res;
+    try{
+      if (orderType === "BOOST"){
+        res = getBoostQuote();
+      } else {
+        res = getAccountQuote();
+      }
+    } catch (e){
+      res = { ok:false, price:0, eta:{days:null}, status:(e && e.message) ? e.message : "Error calculating quote." };
+    }
+
+    if (orderType !== "BOOST"){
+      sumMmrRow.style.display = "none";
     }
 
     if (!res.ok){
-      sumPrice.textContent = "$0";
-      etaText.textContent = "Estimated Time: —";
+      if (res.priceText){
+        sumPrice.textContent = res.priceText;
+      } else {
+        sumPrice.textContent = "$0";
+      }
+      etaText.textContent = formatEtaText({ tbd: !!(res.eta && res.eta.tbd), days: (res.eta && res.eta.days) ?? null, hours: (res.eta && res.eta.hours) ?? null });
       checkoutBtn.disabled = true;
-      setStatus("bad", "For Rank Boost, desired rank must be higher than your current rank.");
+      setStatus("bad", res.status || "Fix the selections above.");
       return;
     }
 
-    sumPrice.textContent = "$" + res.price.toLocaleString();
-    etaText.textContent = "Estimated Time: " + formatETAFromDays(res.etaDays);
-    checkoutBtn.disabled = false;
+    if (res.priceText){
+      sumPrice.textContent = res.priceText;
+    } else {
+      sumPrice.textContent = "$" + Number(res.price).toLocaleString();
+    }
+    etaText.textContent = formatEtaText({ tbd: !!(res.eta && res.eta.tbd), days: (res.eta && res.eta.days) ?? null, hours: (res.eta && res.eta.hours) ?? null });
 
-    const duoText = (method === "Duo") ? "Duo" : "Solo";
-    setStatus("ok", `Estimate ready: $${res.price} • ${serviceType === "RANK" ? "Rank Boost" : "Tournament Boost"} • ${duoText}.`);
+    checkoutBtn.disabled = false;
+    setStatus("ok", res.status || "Estimate ready.");
   }
 
-  rankBoostBtn.addEventListener("click", () => setService("RANK"));
-  tourBoostBtn.addEventListener("click", () => setService("TOUR"));
+  boostsBtn.addEventListener("click", () => setOrderType("BOOST"));
+  accountsBtn.addEventListener("click", () => setOrderType("ACCOUNT"));
 
   soloBtn.addEventListener("click", () => setMethod("Solo"));
   duoBtn.addEventListener("click", () => setMethod("Duo"));
 
-  rankCurrent.addEventListener("change", () => { sfx("tap"); update(); });
-  rankDesired.addEventListener("change", () => { sfx("tap"); update(); });
+  sslTargetMmrBtn.addEventListener("click", () => setSslTargetMode("MMR"));
+  sslRewardsBtn.addEventListener("click", () => setSslTargetMode("REWARDS"));
 
-  tourGoal.addEventListener("change", () => { sfx("tap"); update(); });
+  playlist.addEventListener("change", () => {
+    sfx("tap");
+    populateRankCurrent();
+    populateRankDesired();
+    csRankCurrent.render();
+    csRankDesired.render();
+    csPlaylist.render();
+    updateVisibility();
+    update();
+  });
 
-  region.addEventListener("change", () => { sfx("tap"); update(); });
+  rankCurrent.addEventListener("change", () => {
+    sfx("tap");
+    populateRankDesired();
+    csRankDesired.render();
+    csRankCurrent.render();
+    updateVisibility();
+    update();
+  });
+
+  rankDesired.addEventListener("change", () => {
+    sfx("tap");
+    csRankDesired.render();
+    updateVisibility();
+    update();
+  });
+
+  region.addEventListener("change", () => { sfx("tap"); csRegion.render(); update(); });
+
+  tournamentTarget.addEventListener("change", () => { sfx("tap"); csTournamentTarget.render(); update(); });
+
+  sslTargetMmr.addEventListener("input", () => update());
+  sslCurrentMmr.addEventListener("input", () => update());
+  sslDesiredMmr.addEventListener("input", () => update());
+
+  customDetails.addEventListener("input", () => update());
+
+  accountSelect.addEventListener("change", () => { sfx("tap"); csAccountSelect.render(); update(); });
 
   checkoutBtn.addEventListener("click", () => {
     sfx("success");
@@ -1098,10 +1698,16 @@
     window.location.href = DISCORD_URL;
   });
 
-  setService("RANK");
+  setOrderType("BOOST");
   setMethod("Solo");
+  setSslTargetMode("MMR");
+  csRegion.render();
+  csPlaylist.render();
+  csRankCurrent.render();
+  csRankDesired.render();
+  csTournamentTarget.render();
+  csAccountSelect.render();
   update();
 </script>
 </body>
 </html>
-
