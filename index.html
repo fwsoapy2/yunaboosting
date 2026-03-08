@@ -906,10 +906,17 @@
   };
 
   const SSL_MMR_PRICE_PER_10 = 1;
-  const SSL_BASE_MMR = 1875;
-  const SSL_CURRENT_MIN = 1850;
-  const SSL_TARGET_MIN = 1875;
-  const SSL_MMR_MAX = 2100;
+  const DEFAULT_SSL_RULES = {
+    baseMmr: 1875,
+    currentMin: 1850,
+    targetMin: 1875,
+    maxMmr: 2100,
+  };
+  const SSL_RULES_BY_PLAYLIST = {
+    "2v2": { baseMmr: 1875, currentMin: 1850, targetMin: 1875, maxMmr: 2200 },
+    "3v3": { baseMmr: 1875, currentMin: 1850, targetMin: 1875, maxMmr: 2000 },
+    "snow day": { baseMmr: 1275, currentMin: 1275, targetMin: 1275, maxMmr: 1400 },
+  };
   const SSL_REWARDS_FEE = 10;
 
   const TOURNAMENT_PRICES = {
@@ -1045,9 +1052,14 @@
     return Math.max(1, steps * SSL_MMR_PRICE_PER_10);
   }
 
-  function calculateSslTargetExtraPrice(desiredMmr){
-    if (desiredMmr <= SSL_BASE_MMR) return 0;
-    const steps = Math.ceil((desiredMmr - SSL_BASE_MMR) / 10);
+  function getSslRules(playlist){
+    const pl = (playlist || "").toLowerCase();
+    return SSL_RULES_BY_PLAYLIST[pl] || DEFAULT_SSL_RULES;
+  }
+
+  function calculateSslTargetExtraPrice(desiredMmr, baseMmr){
+    if (desiredMmr <= baseMmr) return 0;
+    const steps = Math.ceil((desiredMmr - baseMmr) / 10);
     return Math.max(0, steps * SSL_MMR_PRICE_PER_10);
   }
 
@@ -1069,6 +1081,7 @@
   function calculateFinalBoostPrice({ playlist, method, region, currentIdx, desiredIdx, currentMmr, desiredMmr, rewards }){
     const pl = (playlist || "").toLowerCase();
     const m  = (method || "solo").toLowerCase();
+    const sslRules = getSslRules(pl);
 
     let basePrice = 0;
     let extraFee = 0;
@@ -1078,7 +1091,7 @@
       basePrice = calculateSslToSslPrice(currentMmr, desiredMmr);
     } else if (desiredIdx === SSL_IDX && currentIdx !== SSL_IDX){
       basePrice = calculateBasePrice(currentIdx, SSL_IDX);
-      basePrice += calculateSslTargetExtraPrice(desiredMmr ?? SSL_BASE_MMR);
+      basePrice += calculateSslTargetExtraPrice(desiredMmr ?? sslRules.baseMmr, sslRules.baseMmr);
       if (rewards) extraFee = SSL_REWARDS_FEE;
     } else {
       basePrice = calculateBasePrice(currentIdx, desiredIdx);
@@ -1089,10 +1102,10 @@
     price *= (PLAYLIST_MULTIPLIERS[pl] ?? 1.0);
 
     if (m === "duo"){
-      if ((region || "").toLowerCase() === "eu"){
-        price *= EU_DUO_TOTAL_MULTIPLIER;
-      } else {
+      if ((region || "").toLowerCase().startsWith("na")){
         price *= DUO_MULTIPLIER;
+      } else {
+        price *= EU_DUO_TOTAL_MULTIPLIER;
       }
     }
 
@@ -1383,7 +1396,7 @@
         value: key,
         label: `${v.title} - $${v.price} - ${v.delivery_hours}h`
       })),
-      { value: "custom_account", label: "Custom Account - build your own" }
+      { value: "custom_account", label: "Custom Account - Build Your Own" }
     ];
     setSelectOptions(accountSelect, opts);
   }
@@ -1440,6 +1453,7 @@
 
   populateRankCurrent();
   populateRankDesired();
+  syncSslInputs();
 
   const csRegion = buildCustomSelect(document.getElementById("csRegion"));
   const csPlaylist = buildCustomSelect(document.getElementById("csPlaylist"));
@@ -1447,6 +1461,22 @@
   const csRankDesired = buildCustomSelect(document.getElementById("csRankDesired"));
   const csTournamentTarget = buildCustomSelect(document.getElementById("csTournamentTarget"));
   const csAccountSelect = buildCustomSelect(document.getElementById("csAccountSelect"));
+
+  function syncSslInputs(){
+    const rules = getSslRules(playlist.value);
+
+    sslTargetMmr.min = String(rules.targetMin);
+    sslTargetMmr.max = String(rules.maxMmr);
+    sslTargetMmr.placeholder = `Enter desired SSL MMR (${rules.targetMin}-${rules.maxMmr})`;
+
+    sslCurrentMmr.min = String(rules.currentMin);
+    sslCurrentMmr.max = String(rules.maxMmr);
+    sslCurrentMmr.placeholder = `${rules.currentMin}-${rules.maxMmr}`;
+
+    sslDesiredMmr.min = String(rules.targetMin);
+    sslDesiredMmr.max = String(rules.maxMmr);
+    sslDesiredMmr.placeholder = `${rules.targetMin}-${rules.maxMmr}`;
+  }
 
   function setRewardsEnabled(next){
     rewardsEnabled = !!next;
@@ -1509,6 +1539,8 @@
   function updateVisibility(){
     const isBoost = (orderType === "BOOST");
     const isDuo = (method === "Duo");
+
+    syncSslInputs();
 
     sumModeRow.style.display = isBoost ? "flex" : "none";
 
@@ -1596,7 +1628,7 @@
         targetKey
       });
 
-      const days = 3;
+      const days = isDuo ? 6 : 3;
 
       return {
         ok: true,
@@ -1654,6 +1686,7 @@
     }
 
     if (curIdx === SSL_IDX && desIdx === SSL_IDX){
+      const sslRules = getSslRules(pl);
       const c = Number(sslCurrentMmr.value);
       const d = Number(sslDesiredMmr.value);
 
@@ -1666,11 +1699,11 @@
       if (!Number.isFinite(c) || !Number.isFinite(d)){
         return { ok:false, price:0, eta:{days:null}, status:`Enter your current and desired SSL MMR.` };
       }
-      if (c < SSL_CURRENT_MIN || c > SSL_MMR_MAX){
-        return { ok:false, price:0, eta:{days:null}, status:`Current MMR must be between ${SSL_CURRENT_MIN} and ${SSL_MMR_MAX}.` };
+      if (c < sslRules.currentMin || c > sslRules.maxMmr){
+        return { ok:false, price:0, eta:{days:null}, status:`Current MMR must be between ${sslRules.currentMin} and ${sslRules.maxMmr}.` };
       }
-      if (d < SSL_TARGET_MIN || d > SSL_MMR_MAX){
-        return { ok:false, price:0, eta:{days:null}, status:`Desired MMR must be between ${SSL_TARGET_MIN} and ${SSL_MMR_MAX}.` };
+      if (d < sslRules.targetMin || d > sslRules.maxMmr){
+        return { ok:false, price:0, eta:{days:null}, status:`Desired MMR must be between ${sslRules.targetMin} and ${sslRules.maxMmr}.` };
       }
       if (d <= c){
         return { ok:false, price:0, eta:{days:null}, status:`Desired MMR must be higher than current MMR.` };
@@ -1699,10 +1732,11 @@
     }
 
     if (desIdx === SSL_IDX && curIdx !== SSL_IDX){
+      const sslRules = getSslRules(pl);
       sumStart.textContent = ranks[curIdx];
       sumEnd.textContent = rewards ? `${ranks[desIdx]} + Rewards` : ranks[desIdx];
 
-      let desiredMmr = SSL_BASE_MMR;
+      let desiredMmr = sslRules.baseMmr;
       if ((sslTargetMmr.value || "").trim() !== ""){
         const d = Number(sslTargetMmr.value);
         sumMmrRow.style.display = "flex";
@@ -1710,16 +1744,16 @@
         sumMmr.textContent = sslTargetMmr.value;
 
         if (!Number.isFinite(d)){
-          return { ok:false, price:0, eta:{days:null}, status:`Enter a valid target SSL MMR (${SSL_TARGET_MIN}-${SSL_MMR_MAX}) or leave it blank for base SSL.` };
+          return { ok:false, price:0, eta:{days:null}, status:`Enter a valid target SSL MMR (${sslRules.targetMin}-${sslRules.maxMmr}) or leave it blank for base SSL.` };
         }
-        if (d < SSL_TARGET_MIN || d > SSL_MMR_MAX){
-          return { ok:false, price:0, eta:{days:null}, status:`Target SSL MMR must be between ${SSL_TARGET_MIN} and ${SSL_MMR_MAX}.` };
+        if (d < sslRules.targetMin || d > sslRules.maxMmr){
+          return { ok:false, price:0, eta:{days:null}, status:`Target SSL MMR must be between ${sslRules.targetMin} and ${sslRules.maxMmr}.` };
         }
         desiredMmr = d;
       } else {
         sumMmrRow.style.display = "flex";
         sumMmrLabel.textContent = "Target SSL MMR";
-        sumMmr.textContent = `${SSL_BASE_MMR} (Base SSL)`;
+        sumMmr.textContent = `${sslRules.baseMmr} (Base SSL)`;
       }
 
       const price = calculateFinalBoostPrice({
