@@ -905,7 +905,7 @@
     "custom": 1.00,
   };
 
-  const SSL_MMR_PRICE_PER_10 = 1;
+  const SSL_MMR_PRICE_PER_10 = 2;
   const DEFAULT_SSL_RULES = {
     baseMmr: 1875,
     currentMin: 1850,
@@ -982,12 +982,12 @@
   const GC2_IDX = ranks.indexOf("Grand Champion II");
 
   const TRANSITION_PRICES = [
-    1, 1, 1, 1,
-    2, 2, 2, 2,
-    3, 3, 3, 3,
-    4, 4, 4, 4,
-    5, 5, 5,
-    10, 15
+    1, 1, 1, 2,
+    2, 2, 3, 3,
+    3, 4, 4, 4,
+    5, 5, 5, 5,
+    5, 5, 10,
+    12, 18
   ];
 
   const FIRST_TIER_INDEX_BY_BASE = {
@@ -1497,7 +1497,6 @@
     statusBox.className = "status " + kind;
     statusBox.textContent = text;
   }
-
   function setOrderType(next){
     orderType = next;
     closeAllCustomSelects();
