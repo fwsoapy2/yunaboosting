@@ -879,8 +879,8 @@
 <script>
   const DISCORD_URL = "https://discord.gg/7w2BWAHSma";
 
-  const DUO_MULTIPLIER = 1.20;
-  const EU_DUO_TOTAL_MULTIPLIER = 1.30;
+  const DUO_MULTIPLIER = 1.40;
+  const EU_DUO_TOTAL_MULTIPLIER = 1.40;
 
   const PLAYLIST_MULTIPLIERS = {
     "1v1": 1.25,
@@ -1108,8 +1108,8 @@
 
     if ((method || "").toLowerCase() === "duo"){
       const r = (region || "").toLowerCase();
-      if (r.startsWith("na")) price *= 1.5;
-      else price *= 2.0;
+      if (r.startsWith("na")) price *= 1.6;
+      else price *= 1.6;
     }
 
     return ceilInt(price);
@@ -1988,3 +1988,4 @@
 </script>
 </body>
 </html>
+
