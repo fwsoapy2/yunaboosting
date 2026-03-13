@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Yuna Boosts</title>
+  <title>YunaBoosts - Home</title>
   <meta name="description" content="Yuna Boosts, premium Rocket League boosting." />
+  <meta name="nav-depth" content="0">
 
   <link rel="icon" type="image/png"
     href="https://images-ext-1.discordapp.net/external/oHMiYNyU7kb5XMQ4WVjwV6mOyckRC_qQZcUYrZqk2gY/%3Fsize%3D4096/https/cdn.discordapp.com/icons/1451305417459372136/b73d024855d393a88a1ea6a3424dc989.png?format=webp&quality=lossless" />
   <link rel="apple-touch-icon"
     href="https://images-ext-1.discordapp.net/external/oHMiYNyU7kb5XMQ4WVjwV6mOyckRC_qQZcUYrZqk2gY/%3Fsize%3D4096/https/cdn.discordapp.com/icons/1451305417459372136/b73d024855d393a88a1ea6a3424dc989.png?format=webp&quality=lossless" />
+  <link rel="stylesheet" href="shared/styles.css">
 
   <style>
     :root{ color-scheme: dark; }
@@ -524,7 +526,7 @@
       transition: border-color .16s ease, background .16s ease, box-shadow .16s ease;
     }
     .check-pill::after{
-      content:"✓";
+      content:"\2713";
       position:absolute;
       left: 18px;
       top: 50%;
@@ -576,16 +578,6 @@
   <div class="bg-orb"></div>
 
   <div class="container">
-    <header>
-      <div class="brand">
-        <div class="logo" aria-hidden="true">
-          <img alt="Yuna Boosts Logo"
-               src="https://images-ext-1.discordapp.net/external/oHMiYNyU7kb5XMQ4WVjwV6mOyckRC_qQZcUYrZqk2gY/%3Fsize%3D4096/https/cdn.discordapp.com/icons/1451305417459372136/b73d024855d393a88a1ea6a3424dc989.png?format=webp&quality=lossless" />
-        </div>
-        <h1>Yuna Boosts</h1>
-      </div>
-      <div></div>
-    </header>
 
     <section class="layout">
       <div class="card calc">
@@ -807,7 +799,7 @@
         </div>
 
         <div class="discord-cta">
-          <button class="discord-btn" id="joinDiscordBtn">Join Discord</button>
+          <button class="discord-btn" id="joinDiscordBtn"><img src="https://media.discordapp.net/attachments/1451341708892831895/1481820095054614588/discord-white-icon.png?ex=69b4b401&is=69b36281&hm=2eaad3822d5f91737ef81fc1d0aeaa236b69e5a5b7f4378b6cdc9be8de796cc9&=&format=webp&quality=lossless" width="18" style="vertical-align:middle; margin-right:6px;" alt="Discord icon" />Join Discord</button>
         </div>
       </div>
 
@@ -862,8 +854,6 @@
             <div class="sum-right" id="sumRegion">-</div>
           </div>
 
-          <div class="sum-divider"></div>
-
           <div class="total-wrap">
             <div class="label">Total Price</div>
             <div class="price" id="sumPrice">$0</div>
@@ -883,11 +873,9 @@
       </aside>
     </section>
 
-    <footer>
-      © <span id="year"></span> Yuna Boosts • Checkout redirects to Discord.
-    </footer>
   </div>
 
+<script src="shared/nav.js"></script>
 <script>
   const DISCORD_URL = "https://discord.gg/7w2BWAHSma";
 
@@ -1148,7 +1136,8 @@
     return `Estimated Time: ${days} day${days === 1 ? "" : "s"}`;
   }
 
-  document.getElementById("year").textContent = new Date().getFullYear();
+  const yearEl = document.getElementById("year");
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
 
   let orderType = "BOOST";
   let method = "Solo";
@@ -1482,7 +1471,7 @@
     rewardsEnabled = !!next;
     rewardsToggleBtn.classList.toggle("active", rewardsEnabled);
     rewardsToggleBtn.setAttribute("aria-checked", String(rewardsEnabled));
-    rewardsToggleBtn.textContent = rewardsEnabled ? "✓ Rewards On" : "Rewards Off";
+    rewardsToggleBtn.textContent = rewardsEnabled ? "\u2713 Rewards On" : "Rewards Off";
     update();
   }
 
@@ -1497,6 +1486,7 @@
     statusBox.className = "status " + kind;
     statusBox.textContent = text;
   }
+
   function setOrderType(next){
     orderType = next;
     closeAllCustomSelects();
@@ -1633,7 +1623,7 @@
         ok: true,
         price,
         eta: { days },
-        status: `Estimate ready: $${price} • Tournament • ${isDuo ? "Duo" : "Solo"}.`
+        status: `Estimate ready: $${price} \u2022 Tournament \u2022 ${isDuo ? "Duo" : "Solo"}.`
       };
     }
 
@@ -1726,7 +1716,7 @@
         ok:true,
         price,
         eta:{ days },
-        status:`Estimate ready: $${price} • ${sumPlaylist.textContent} • ${isDuo ? "Duo" : "Solo"}.`
+        status:`Estimate ready: $${price} \u2022 ${sumPlaylist.textContent} \u2022 ${isDuo ? "Duo" : "Solo"}.`
       };
     }
 
@@ -1773,7 +1763,7 @@
         ok:true,
         price,
         eta:{ days },
-        status:`Estimate ready: $${price} • ${sumPlaylist.textContent} • ${isDuo ? "Duo" : "Solo"}${rewards ? " • Rewards" : ""}.`
+        status:`Estimate ready: $${price} \u2022 ${sumPlaylist.textContent} \u2022 ${isDuo ? "Duo" : "Solo"}${rewards ? " \u2022 Rewards" : ""}.`
       };
     }
 
@@ -1817,7 +1807,7 @@
       ok:true,
       price,
       eta:{ days },
-      status:`Estimate ready: $${price} • ${sumPlaylist.textContent} • ${isDuo ? "Duo" : "Solo"}${rewards ? " • Rewards" : ""}.`
+      status:`Estimate ready: $${price} \u2022 ${sumPlaylist.textContent} \u2022 ${isDuo ? "Duo" : "Solo"}${rewards ? " \u2022 Rewards" : ""}.`
     };
   }
 
@@ -1858,7 +1848,7 @@
       ok:true,
       price,
       eta:{ hours },
-      status:`Account ready: $${price} • Delivery ${hours}h. Images available in Discord.`
+      status:`Account ready: $${price} \u2022 Delivery ${hours}h. Images available in Discord.`
     };
   }
 
