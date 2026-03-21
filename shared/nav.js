@@ -1,10 +1,11 @@
 (function() {
   const DISCORD_URL = "https://discord.gg/7w2BWAHSma";
-  const LOGO_URL = "https://images-ext-1.discordapp.net/external/oHMiYNyU7kb5XMQ4WVjwV6mOyckRC_qQZcUYrZqk2gY/%3Fsize%3D4096/https/cdn.discordapp.com/icons/1451305417459372136/b73d024855d393a88a1ea6a3424dc989.png?format=webp&quality=lossless";
-  const DISCORD_ICON = "https://media.discordapp.net/attachments/1451341708892831895/1481820095054614588/discord-white-icon.png?ex=69b4b401&is=69b36281&hm=2eaad3822d5f91737ef81fc1d0aeaa236b69e5a5b7f4378b6cdc9be8de796cc9&=&format=webp&quality=lossless";
 
   const depth = (document.querySelector('meta[name="nav-depth"]') || {}).content || "0";
   const prefix = depth === "1" ? "../" : "./";
+
+  const LOGO_URL = prefix + "logo.png";
+  const DISCORD_ICON = prefix + "discord.png";
 
   const currentPath = window.location.pathname.toLowerCase().replace(/\/index\.html$/,'').replace(/\/$/,'');
   function isActive(page) {
