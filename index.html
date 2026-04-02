@@ -2665,8 +2665,8 @@
         const net = 0.65 * rw - 0.35 * rl2;
         const def = 0.65 * 20 - 0.35 * 20; // default net at 20/20
         if (net > 0 && def > 0) {
-          // Dampened: 50% base + 50% scaled
-          price *= (0.5 + 0.5 * (def / net));
+          // Dampened: 75% base + 25% scaled, capped at 2x
+          price *= Math.min(2, 0.75 + 0.25 * (def / net));
         }
       }
     }
@@ -2708,7 +2708,7 @@
         const net = 0.65 * rw - 0.35 * rl2;
         if (net > 0) {
           const def = 0.65 * 20 - 0.35 * 20;
-          if (def > 0) etaDays = etaDays * (def / net);
+          if (def > 0) etaDays = etaDays * Math.min(2, 0.75 + 0.25 * (def / net));
         }
       }
     }
